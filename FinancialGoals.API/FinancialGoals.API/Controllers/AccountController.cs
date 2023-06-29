@@ -3,7 +3,10 @@ using FinancialGoals.Data.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace FinancialGoals.API.Controllers
 {
@@ -32,7 +35,6 @@ namespace FinancialGoals.API.Controllers
             return "value";
         }
 
-        // POST api/<AccountController>
         [HttpPost]
         public async Task<IActionResult> Post(LoginModel model)
         {
@@ -50,14 +52,25 @@ namespace FinancialGoals.API.Controllers
                 new Claim(ClaimTypes.Email, user.Email)
             };
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                principal,
-                new AuthenticationProperties {IsPersistent = model.RememberLogin});
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("TokenKey").Value));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            return Ok(user);
+            var token = new JwtSecurityToken(
+                issuer: "your-issuer",
+                audience: "your-audience",
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: credentials
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Ok(tokenString);
 
             //var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             //if (result.Succeeded)
