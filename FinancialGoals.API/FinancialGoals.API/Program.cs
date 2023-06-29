@@ -1,3 +1,5 @@
+using FinancialGoals.API;
+using FinancialGoals.API.Middlewares;
 using FinancialGoals.Data.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => c.AddSwaggerApiKeySecurity());
 
 builder.Services.AddDbContext<FinancialDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("FinancialGoalsConnection"))
@@ -26,6 +28,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//app.UseApiKey(); // == UseMiddleware<ApiKeyMiddleware>(); // but i created an extension
 app.UseAuthorization();
 
 app.MapControllers();
