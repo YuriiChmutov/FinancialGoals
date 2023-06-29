@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FinancialGoals.API.Filters;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using FinancialGoals.API.Filters;
 using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancialGoals.API.Controllers
 {
@@ -36,8 +32,10 @@ namespace FinancialGoals.API.Controllers
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
+            var user = User; // to get user claims (its not my user, its ClaimsPrincipal), just to see at debug mode
             if (_context.Categories == null)
             {
                 return NotFound();

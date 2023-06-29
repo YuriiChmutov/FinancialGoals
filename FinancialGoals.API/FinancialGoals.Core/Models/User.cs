@@ -1,4 +1,6 @@
-﻿namespace FinancialGoals.Core.Models
+﻿using FinancialGoals.Services;
+
+namespace FinancialGoals.Core.Models
 {
     public class User
     {
@@ -9,5 +11,6 @@
         public DateTime? BirthDate { get; set; }
         public string Password { get; set; }
         public List<FinancialAccount>? FinancialAccounts { get; set;}
+        public UserRole Role { get; set; }
     }
 }
