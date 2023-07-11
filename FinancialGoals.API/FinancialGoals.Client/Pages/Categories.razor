@@ -1,0 +1,41 @@
+﻿@page "/categories"
+@inject IModalService modal
+
+<h3>Categories</h3>
+
+@inject HttpClient httpClient
+
+<PageTitle>Categories</PageTitle>
+
+@* <h1>Categories</h1> *@
+
+<div>
+    <Button @onclick="@((() => modal.Show<CategoriesAdd>("Modal")))" Type="primary">Primary</Button>
+</div>
+
+@if (categories == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    @foreach (var category in categories)
+    {
+        <Card Title=@(category.Name) Style="width: 300px;">
+            <p>Test content</p>
+        </Card>
+    }
+}
+
+@code {
+    private List<Category> categories;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    [Parameter] public int ItemId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await httpClient.GetFromJsonAsync<List<Category>>("https://localhost:7128/api/Categories");
+    }
+}
