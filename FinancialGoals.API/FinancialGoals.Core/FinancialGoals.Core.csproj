@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="6.0.18" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FinancialGoals.Services\FinancialGoals.Services.csproj" />
   </ItemGroup>
 

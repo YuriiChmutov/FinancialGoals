@@ -1,4 +1,5 @@
-﻿using FinancialGoals.Services;
+﻿using System.Text.Json.Serialization;
+using FinancialGoals.Services;
 
 namespace FinancialGoals.Core.Models
 {

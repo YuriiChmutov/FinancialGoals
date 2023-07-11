@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Azure.Cosmos;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 //builder.Services.AddSwaggerGen(c => c.AddSwaggerApiKeySecurity());
 
@@ -52,7 +54,36 @@ builder.Services.AddDbContext<FinancialDbContext>(opt =>
         .EnableSensitiveDataLogging()
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
+builder.Services.AddDbContext<CosmosDbContext>(options =>
+{
+    options.UseCosmos(
+        "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
+        "Goals"
+    );
+});
+
+//builder.Services.AddDbContext<FinancialDbContext>(opt =>
+//{
+//    opt.UseCosmos(
+//        configuration.GetSection("CosmosDB:EndpointUri").Value,
+//        configuration.GetSection("CosmosDB:PrimaryKey").Value,
+//        configuration.GetSection("CosmosDB:DatabaseName").Value,
+//        cosmosOptionsAction: cosmosOptions =>
+//        {
+//            cosmosOptions.ConnectionMode(ConnectionMode.Direct);
+//            cosmosOptions.MaxRequestsPerTcpConnection(20);
+//            cosmosOptions.MaxTcpConnectionsPerEndpoint(32);
+//        });
+//});
+
 var app = builder.Build();
+
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

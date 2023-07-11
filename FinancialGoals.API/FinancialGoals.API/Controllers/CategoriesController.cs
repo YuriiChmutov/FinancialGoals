@@ -20,7 +20,7 @@ namespace FinancialGoals.API.Controllers
 
         // GET: api/Categories
         [HttpGet]
-        [TypeFilter(typeof(ApiKeyAttribute))]
+        //[TypeFilter(typeof(ApiKeyAttribute))]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
             if (_context.Categories == null)
