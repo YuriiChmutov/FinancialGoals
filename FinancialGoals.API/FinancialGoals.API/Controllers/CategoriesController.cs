@@ -1,9 +1,13 @@
 ﻿using FinancialGoals.API.Filters;
-using FinancialGoals.Core.Models;
+using FinancialGoals.Core.DTOs;
 using FinancialGoals.Data.Data;
+using FinancialGoals.Data.Repository.CategoryService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using FinancialGoals.Core.DTOs.Category;
+using FinancialGoals.Core.Models;
 
 namespace FinancialGoals.API.Controllers
 {
@@ -11,64 +15,65 @@ namespace FinancialGoals.API.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly FinancialDbContext _context;
+        private readonly ICategoryService _categoryService;
+        private readonly IMapper _mapper;
 
-        public CategoriesController(FinancialDbContext context)
+        public CategoriesController(ICategoryService categoryService, IMapper mapper)
         {
-            _context = context;
+            _categoryService = categoryService;
+            _mapper = mapper;
         }
 
         // GET: api/Categories
         [HttpGet]
         //[TypeFilter(typeof(ApiKeyAttribute))]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<CategoryToReturn>>> GetCategories()
         {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            return await _context.Categories.ToListAsync();
+            var categoriesFromRepo = await _categoryService.GetCategoriesAsync();
+
+            var categoriesToReturn = _mapper.Map<List<CategoryToReturn>>(categoriesFromRepo);
+
+            return Ok(categoriesToReturn);
         }
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
-        [Authorize]
-        public async Task<ActionResult<Category>> GetCategory(int id)
+        // [Authorize]
+        public async Task<ActionResult<CategoryToReturn>> GetCategory(int id)
         {
             var user = User; // to get user claims (its not my user, its ClaimsPrincipal), just to see at debug mode
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            var category = await _context.Categories.FindAsync(id);
 
-            if (category == null)
+            var categoryFromRepo = await _categoryService.GetCategoryAsync(id);
+        
+            if (categoryFromRepo == null)
             {
                 return NotFound();
             }
 
-            return category;
+            var categoryToReturn = _mapper.Map<CategoryToReturn>(categoryFromRepo);
+        
+            return categoryToReturn;
         }
-
+        
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(int id, Category category)
+        public async Task<IActionResult> PutCategory(int id, CategoryToUpdate modifiedCategory)
         {
-            if (id != category.CategoryId)
+            if (id != modifiedCategory.CategoryId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(category).State = EntityState.Modified;
-
+            var categoryToUpdate = _mapper.Map<Category>(modifiedCategory);
+            
             try
             {
-                await _context.SaveChangesAsync();
+                await _categoryService.UpdateCategoryAsync(id, categoryToUpdate);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CategoryExists(id))
+                if (!await _categoryService.CategoryExistsAsync(id))
                 {
                     return NotFound();
                 }
@@ -77,48 +82,29 @@ namespace FinancialGoals.API.Controllers
                     throw;
                 }
             }
-
+        
             return NoContent();
         }
-
+        
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        public async Task<ActionResult<Category>> PostCategory(CategoryToCreate newCategory)
         {
-            if (_context.Categories == null)
-            {
-                return Problem("Entity set 'FinancialDbContext.Categories'  is null.");
-            }
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
+            var category = _mapper.Map<Core.Models.Category>(newCategory);
+            await _categoryService.AddCategoryAsync(category);
 
-            return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
+            var categoryToReturn = _mapper.Map<Category>(category);
+            
+            return CreatedAtAction("GetCategory", new { id = categoryToReturn.CategoryId }, categoryToReturn);
         }
-
+        
         // DELETE: api/Categories/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
+            await _categoryService.DeleteCategoryAsync(id);
             return NoContent();
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return (_context.Categories?.Any(e => e.CategoryId == id)).GetValueOrDefault();
         }
     }
 }

@@ -1,0 +1,36 @@
+﻿@page "/categoriesAdd"
+
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json;
+@using System.ComponentModel
+@using FinancialGoals.Core.DTOs.Category
+
+@inject HttpClient Http
+@inject ICategoryService CategoryService
+
+<Form Model="@categoryToCreate"
+      LabelColSpan="8"
+      WrapperColSpan="16"
+            >
+        <FormItem>
+            <Input @bind-Value="@context.Name"/>
+        </FormItem>
+
+        <FormItem WrapperColOffset="8" WrapperColSpan="16">
+            <Button Type="@ButtonType.Primary" HtmlType="submit" @onclick="CreateCategory">
+                Submit
+            </Button>
+        </FormItem>
+    </Form>
+
+@code {
+    CategoryToCreate categoryToCreate = new CategoryToCreate();
+    
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    private async Task CreateCategory()
+    {
+        CategoryService.AddCategory(categoryToCreate);
+        await BlazoredModal.CloseAsync();
+    }
+}

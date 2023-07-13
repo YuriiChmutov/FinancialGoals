@@ -1,0 +1,74 @@
+﻿@page "/categories"
+@inject IModalService modal
+@inject ICategoryService CategoryService
+@implements IDisposable
+
+<h3>Categories</h3>
+
+@inject HttpClient httpClient
+
+<PageTitle>Categories</PageTitle>
+
+<div>
+    <Button @onclick="@(OpenCreateForm)" Type="primary">Primary</Button>
+    @* <Button @onclick="@(() => Console.WriteLine("hello"))" Type="primary">Primary</Button> *@
+</div>
+
+@if (CategoryService.Categories == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <div>
+        <GridRow>
+            @foreach (var category in CategoryService.Categories)
+                {
+                    <GridCol Span="6">
+                        <Card Title=@(category.Name) Style="width: 300px;"
+                              Actions="@(new[] {
+                                        actionEdit(() => OpenEditForm(category.CategoryId)),
+                                        actionDelete(() => DeleteCategory(category.CategoryId))
+                                     })">
+                            <p>0 / 1.000</p>
+                        </Card>
+                    </GridCol>
+                }
+        </GridRow>
+    </div>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await CategoryService.GetCategories();
+        CategoryService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        CategoryService.OnChange -= StateHasChanged;
+    }
+    
+    RenderFragment actionEdit(Action clickAction) =>@<Icon Type="edit" OnClick="@clickAction" />;
+    RenderFragment actionDelete(Action clickAction) =>@<Icon Type="delete" OnClick="@clickAction" />;
+
+    private void OpenCreateForm()
+    {
+        modal.Show<CategoriesAdd>("Create category");
+    }
+    
+    private void OpenEditForm(int ItemId)
+    {
+        var parameters = new ModalParameters().Add(nameof(CategoriesEdit.ItemId), ItemId);
+        modal.Show<CategoriesEdit>("Passing data", parameters);
+        StateHasChanged();
+    }
+
+    private async Task DeleteCategory(int id)
+    {
+        CategoryService.DeleteCategory(id);
+    }
+}

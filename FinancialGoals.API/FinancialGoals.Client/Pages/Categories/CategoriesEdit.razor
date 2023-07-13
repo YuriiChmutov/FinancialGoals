@@ -1,0 +1,73 @@
+﻿@* @page "/CategoriesEdit" *@
+
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json;
+@using System.ComponentModel
+@using AutoMapper
+@using FinancialGoals.Core.DTOs.Category
+
+@inject HttpClient Http
+@inject ICategoryService CategoryService
+@inject IMapper Mapper
+
+@if (categoryModified == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <div>
+        @categoryModified.CategoryId
+        @categoryModified.Name
+        <button @onclick="Close"></button>
+    </div>
+    
+    <Form Model="@categoryModified"
+          LabelColSpan="8"
+          WrapperColSpan="16"
+                >
+        <FormItem>
+            <Input @bind-Value="@context.Name" />
+        </FormItem>
+
+        <FormItem WrapperColOffset="8" WrapperColSpan="16">
+            <Button Type="@ButtonType.Primary" HtmlType="submit" @onclick="UpdateItem">
+                Submit
+            </Button>
+        </FormItem>
+    </Form>
+}
+
+
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public int ItemId { get; set; }
+    
+    private CategoryToUpdate categoryModified;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var categoryToReturn = await Http.GetFromJsonAsync<CategoryToReturn>($"https://localhost:7128/api/Categories/{ItemId}");
+        categoryModified = Mapper.Map<CategoryToUpdate>(categoryToReturn);
+    }
+    
+    // private Category editItem = new Category();
+
+    private void EditItem(long id)
+    {
+        //editItem = todoItems.Single(i => i.Id == id);
+    }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
+
+    private async Task UpdateItem()
+    {
+        //await Http.PutAsJsonAsync($"https://localhost:7128/api/Categories/{ItemId}", category);
+        CategoryService.UpdateCategory(categoryModified);
+        await BlazoredModal.CloseAsync();
+        StateHasChanged();
+    }
+}
