@@ -1,0 +1,23 @@
+﻿@inject HttpClient Http
+@inject ICategoryService CategoryService
+
+<Divider Orientation="right">
+    <Button Danger Type="@ButtonType.Primary" HtmlType="submit" @onclick="Delete">
+        Ok
+    </Button>
+    <Button Type="@ButtonType.Dashed" @onclick="Close">
+        Cancel
+    </Button>
+</Divider>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public int ItemId { get; set; }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
+    private async Task Delete()
+    {
+        await CategoryService.DeleteCategory(ItemId);
+        await BlazoredModal.CloseAsync();
+    }
+}

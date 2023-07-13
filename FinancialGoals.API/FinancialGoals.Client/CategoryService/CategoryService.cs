@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using FinancialGoals.Core.DTOs;
 using FinancialGoals.Core.DTOs.Category;
 
@@ -26,11 +27,13 @@ public class CategoryService : ICategoryService
         throw new NotImplementedException();
     }
 
-    public async Task AddCategory(CategoryToCreate newCategory)
+    public async Task<bool> AddCategory(CategoryToCreate newCategory)
     {
-        await _http.PostAsJsonAsync("https://localhost:7128/api/Categories", newCategory);
+        var response = await _http.PostAsJsonAsync("https://localhost:7128/api/Categories", newCategory);
         await GetCategories();
         OnChange.Invoke();
+
+        return response.StatusCode == HttpStatusCode.Created ? true : false;
     }
 
     public CategoryToCreate CreateNewCategory()
@@ -41,11 +44,13 @@ public class CategoryService : ICategoryService
         return newCategory;
     }
 
-    public async Task UpdateCategory(CategoryToUpdate categoryModified)
+    public async Task<bool> UpdateCategory(CategoryToUpdate categoryModified)
     {
-        await _http.PutAsJsonAsync($"https://localhost:7128/api/Categories/{categoryModified.CategoryId}", categoryModified);
+        var response = await _http.PutAsJsonAsync($"https://localhost:7128/api/Categories/{categoryModified.CategoryId}", categoryModified);
         await GetCategories();
         OnChange.Invoke();
+
+        return response.StatusCode == HttpStatusCode.OK ? true: false;
     }
 
     public async Task DeleteCategory(int id)

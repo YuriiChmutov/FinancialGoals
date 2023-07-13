@@ -20,27 +20,29 @@ else
 {
     <div>
         @categoryModified.CategoryId
-        @categoryModified.Name
-        <button @onclick="Close"></button>
     </div>
     
     <Form Model="@categoryModified"
           LabelColSpan="8"
-          WrapperColSpan="16"
-                >
-        <FormItem>
-            <Input @bind-Value="@context.Name" />
+          WrapperColSpan="16">
+        <DataAnnotationsValidator/>
+        <FormItem Label="Name" ShowFeedbackOnError="true">
+            <Input @bind-Value="@context.Name"/>
+        </FormItem>
+        <FormItem Label="Limit" ShowFeedbackOnError="true">
+            <AntDesign.InputNumber @bind-Value="@context.Limit" />
         </FormItem>
 
-        <FormItem WrapperColOffset="8" WrapperColSpan="16">
+        <Divider Orientation="right">
             <Button Type="@ButtonType.Primary" HtmlType="submit" @onclick="UpdateItem">
-                Submit
+                Update
             </Button>
-        </FormItem>
+            <Button Type="@ButtonType.Dashed" @onclick="Close">
+                Cancel
+            </Button>
+        </Divider>
     </Form>
 }
-
-
 
 @code {
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
@@ -65,9 +67,7 @@ else
 
     private async Task UpdateItem()
     {
-        //await Http.PutAsJsonAsync($"https://localhost:7128/api/Categories/{ItemId}", category);
-        CategoryService.UpdateCategory(categoryModified);
-        await BlazoredModal.CloseAsync();
-        StateHasChanged();
+        var result = await CategoryService.UpdateCategory(categoryModified);
+        if (result) await BlazoredModal.CloseAsync();
     }
 }

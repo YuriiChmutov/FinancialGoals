@@ -9,8 +9,8 @@ public interface ICategoryService
     List<CategoryToReturn> Categories { get; set; }
     Task GetCategories();
     Task<CategoryToReturn> GetCategory(int categoryId);
-    Task AddCategory(CategoryToCreate category);
+    Task<bool> AddCategory(CategoryToCreate category);
     CategoryToCreate CreateNewCategory();
-    Task UpdateCategory(CategoryToUpdate category);
+    Task<bool> UpdateCategory(CategoryToUpdate category);
     Task DeleteCategory(int id);
 }

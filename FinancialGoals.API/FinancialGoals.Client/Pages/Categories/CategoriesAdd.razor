@@ -9,19 +9,27 @@
 @inject ICategoryService CategoryService
 
 <Form Model="@categoryToCreate"
-      LabelColSpan="8"
-      WrapperColSpan="16"
-            >
-        <FormItem>
-            <Input @bind-Value="@context.Name"/>
-        </FormItem>
+      LabelColSpan="4"
+      WrapperColSpan="18">
+    <DataAnnotationsValidator/>
+    <FormItem Label="Name" ShowFeedbackOnError="true">
+        <Input @bind-Value="@context.Name"/>
+    </FormItem>
+    <FormItem Label="Limit" ShowFeedbackOnError="true">
+        <AntDesign.InputNumber @bind-Value="@context.Limit" />
+    </FormItem>
 
-        <FormItem WrapperColOffset="8" WrapperColSpan="16">
-            <Button Type="@ButtonType.Primary" HtmlType="submit" @onclick="CreateCategory">
-                Submit
-            </Button>
-        </FormItem>
-    </Form>
+    <Divider Orientation="right">
+        <Button Color="@Color.Green6" Type="@ButtonType.Primary" HtmlType="submit" @onclick="CreateCategory" 
+                >
+            Create
+        </Button>
+        <Button Type="@ButtonType.Dashed" @onclick="Close">
+            Cancel
+        </Button>
+    </Divider>
+       
+</Form>
 
 @code {
     CategoryToCreate categoryToCreate = new CategoryToCreate();
@@ -30,7 +38,9 @@
 
     private async Task CreateCategory()
     {
-        CategoryService.AddCategory(categoryToCreate);
-        await BlazoredModal.CloseAsync();
+        var result = await CategoryService.AddCategory(categoryToCreate);
+        if (result) await BlazoredModal.CloseAsync();    
     }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
 }

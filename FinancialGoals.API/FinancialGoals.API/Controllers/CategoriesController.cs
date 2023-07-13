@@ -83,7 +83,7 @@ namespace FinancialGoals.API.Controllers
                 }
             }
         
-            return NoContent();
+            return Ok();
         }
         
         // POST: api/Categories

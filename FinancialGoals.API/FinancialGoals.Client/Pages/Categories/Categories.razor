@@ -3,16 +3,23 @@
 @inject ICategoryService CategoryService
 @implements IDisposable
 
-<h3>Categories</h3>
 
 @inject HttpClient httpClient
 
 <PageTitle>Categories</PageTitle>
+<GridRow>
+    <GridCol Span="3">
+        <h3>Categories</h3>
+    </GridCol>
+    <GridCol>
+        <div>
+            <Button Shape="@ButtonShape.Circle" Icon="plus" @onclick="@(OpenCreateForm)" Type="primary"/>
+        </div>
+    </GridCol>
+</GridRow>
 
-<div>
-    <Button @onclick="@(OpenCreateForm)" Type="primary">Primary</Button>
-    @* <Button @onclick="@(() => Console.WriteLine("hello"))" Type="primary">Primary</Button> *@
-</div>
+
+
 
 @if (CategoryService.Categories == null)
 {
@@ -30,9 +37,9 @@ else
                         <Card Title=@(category.Name) Style="width: 300px;"
                               Actions="@(new[] {
                                         actionEdit(() => OpenEditForm(category.CategoryId)),
-                                        actionDelete(() => DeleteCategory(category.CategoryId))
+                                        actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name))
                                      })">
-                            <p>0 / 1.000</p>
+                            <p>0 / @category.Limit</p>
                         </Card>
                     </GridCol>
                 }
@@ -52,6 +59,7 @@ else
         CategoryService.OnChange -= StateHasChanged;
     }
     
+    @* RenderFragment actionCreate(Action clickAction) =>@<Icon Type="plus" OnClick="@clickAction" />; *@
     RenderFragment actionEdit(Action clickAction) =>@<Icon Type="edit" OnClick="@clickAction" />;
     RenderFragment actionDelete(Action clickAction) =>@<Icon Type="delete" OnClick="@clickAction" />;
 
@@ -63,12 +71,13 @@ else
     private void OpenEditForm(int ItemId)
     {
         var parameters = new ModalParameters().Add(nameof(CategoriesEdit.ItemId), ItemId);
-        modal.Show<CategoriesEdit>("Passing data", parameters);
-        StateHasChanged();
+        modal.Show<CategoriesEdit>("Edit category", parameters);
     }
 
-    private async Task DeleteCategory(int id)
+    private void OpenDeleteForm(int ItemId, string ItemName)
     {
-        CategoryService.DeleteCategory(id);
+        var parameters = new ModalParameters().Add(nameof(CategoriesEdit.ItemId), ItemId);
+        modal.Show<CategoryDelete>($"Are you sure that you want to delete '{ItemName}' category?", parameters);
+        // StateHasChanged();
     }
 }
