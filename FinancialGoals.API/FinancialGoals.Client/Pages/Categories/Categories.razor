@@ -1,10 +1,8 @@
 ﻿@page "/categories"
+
 @inject IModalService modal
 @inject ICategoryService CategoryService
 @implements IDisposable
-
-
-@inject HttpClient httpClient
 
 <PageTitle>Categories</PageTitle>
 <GridRow>
@@ -17,9 +15,6 @@
         </div>
     </GridCol>
 </GridRow>
-
-
-
 
 @if (CategoryService.Categories == null)
 {
@@ -39,7 +34,7 @@ else
                                         actionEdit(() => OpenEditForm(category.CategoryId)),
                                         actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name))
                                      })">
-                            <p>0 / @category.Limit</p>
+                            <p>@category.Amount / @category.Limit</p>
                         </Card>
                     </GridCol>
                 }

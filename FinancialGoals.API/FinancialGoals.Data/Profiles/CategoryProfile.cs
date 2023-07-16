@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using FinancialGoals.Core.DTOs.Category;
 using FinancialGoals.Core.Models;
+using FinancialGoals.Data.Resolvers;
 
-namespace FinancialGoals.API.Profiles;
+namespace FinancialGoals.Data.Profiles;
 
 public class CategoryProfile : Profile
 {
     public CategoryProfile()
     {
-        CreateMap<Category, Core.DTOs.Category.CategoryToReturn>().ReverseMap();
+        CreateMap<Category, Core.DTOs.Category.CategoryToReturn>()
+            .ForMember(dest => dest.Amount, opt => opt.MapFrom<CategoryAmountResolver>())
+            .ReverseMap();
 
         CreateMap<CategoryToCreate, Category>()
             .ForMember(m => m.CategoryId, options => options.Ignore())

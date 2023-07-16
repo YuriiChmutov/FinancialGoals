@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using FinancialGoals.Data.Repository.CategoryService;
+using FinancialGoals.Data.Repository.TransactionService;
+using FinancialGoals.Data.Resolvers;
 using Microsoft.Azure.Cosmos;
 
 
@@ -15,10 +17,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 
 // builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<CategoryAmountResolver>();
+
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 
 //builder.Services.AddSwaggerGen(c => c.AddSwaggerApiKeySecurity());
 

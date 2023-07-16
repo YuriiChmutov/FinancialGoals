@@ -1,0 +1,72 @@
+﻿@page "/transactions"
+
+@inject IModalService modal
+@inject ITransactionService TransactionService
+@using FinancialGoals.Services
+@implements IDisposable
+
+<AntList Class="demo-loadmore-list" DataSource="@TransactionService.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
+    <ChildContent Context="item">
+        <ListItem Actions="actions">
+            <ListItemMeta AvatarTemplate="avatar" Description="@item.Description">
+                <TitleTemplate>
+                    <a href="https://ant.design">@item.Type</a>
+                </TitleTemplate>
+            </ListItemMeta>
+            <div>
+                @{
+                    if (item.Type == TransactionType.Income)
+                    {
+                        <p>+ @item.Amount</p>
+                    }
+                    else
+                    {
+                        <p>- @item.Amount</p>
+                    }
+                }
+            </div>
+        </ListItem>
+    </ChildContent>
+    <LoadMore>
+        @if (!InitLoading && !Loading)
+        {
+            <div class="demo-loadmore-btn-content ">
+                <Button OnClick="OnLoadMore">loading more</Button>
+            </div>
+        }
+    </LoadMore>
+</AntList>
+
+@code {
+    public bool InitLoading { get; set; } = true;
+    public bool Loading { get; set; } = false;
+    public RenderFragment[] actions = new[] { edit, add };
+    
+    static RenderFragment avatar =@<Avatar Src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"></Avatar>;
+    static RenderFragment edit = @<a key="list-loadmore-edit">edit</a>;
+    static RenderFragment add = @<a key="list-loadmore-more">more</a>;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var currentUserId = 1;
+        await TransactionService.GetTransactions(currentUserId);
+        TransactionService.OnChange += StateHasChanged;
+        InitLoading = false;
+        await base.OnInitializedAsync();
+    }
+    
+    public async Task OnLoadMore()
+    {
+        Loading = true;
+        // var res = await GetData();
+        // Data.AddRange(res);
+        Loading = false;
+    }
+    
+
+    public void Dispose()
+    {
+        TransactionService.OnChange -= StateHasChanged;
+    }
+    
+}

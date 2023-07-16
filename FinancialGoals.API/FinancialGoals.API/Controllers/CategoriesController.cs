@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using FinancialGoals.Core.DTOs.Category;
 using FinancialGoals.Core.Models;
+using FinancialGoals.Data.Repository.TransactionService;
 
 namespace FinancialGoals.API.Controllers
 {
@@ -16,12 +17,14 @@ namespace FinancialGoals.API.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
+        private readonly ITransactionService _transactionService;
         private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryService categoryService, IMapper mapper)
+        public CategoriesController(ICategoryService categoryService, IMapper mapper, ITransactionService transactionService)
         {
             _categoryService = categoryService;
             _mapper = mapper;
+            _transactionService = transactionService;
         }
 
         // GET: api/Categories
@@ -32,7 +35,7 @@ namespace FinancialGoals.API.Controllers
             var categoriesFromRepo = await _categoryService.GetCategoriesAsync();
 
             var categoriesToReturn = _mapper.Map<List<CategoryToReturn>>(categoriesFromRepo);
-
+            
             return Ok(categoriesToReturn);
         }
 
