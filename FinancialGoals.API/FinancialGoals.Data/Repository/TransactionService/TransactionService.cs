@@ -16,7 +16,10 @@ public class TransactionService : ITransactionService
 
     public async Task<List<Transaction>> GetTransactionsByAccountIdAsync(int accountId)
     {
-        return await _context.Transactions.Where(t => t.FinancialAccountId == accountId).ToListAsync();
+        return await _context.Transactions
+            //.Include(t => t.Category)
+            .Where(t => t.FinancialAccountId == accountId)
+            .ToListAsync();
     }
 
     public async Task<List<Transaction>> GetTransactionsByDateAsync(int accountId, DateTime dateStart, DateTime? dateEnd = null)

@@ -6,18 +6,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
+using Azure.Storage.Blobs;
 using FinancialGoals.Data.Repository.CategoryService;
 using FinancialGoals.Data.Repository.TransactionService;
 using FinancialGoals.Data.Resolvers;
+using FinancialGoals.Services;
 using Microsoft.Azure.Cosmos;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+
+builder.Services.AddControllers().AddJsonOptions(opt => opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
 
 // builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<ITransactionService, TransactionService>();
@@ -45,6 +48,16 @@ var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json")
     .Build();
+
+string blobStorageConnection =
+    configuration.GetConnectionString("BlobStorageConnection");
+string containerName = "categoryicons";
+
+builder.Services.AddSingleton(x => 
+    new BlobServiceClient(blobStorageConnection));
+builder.Services.AddScoped<BlobStorageService>(x => 
+    new BlobStorageService(x.GetService<BlobServiceClient>(), containerName));
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>

@@ -2,12 +2,18 @@
 
 @inject IModalService modal
 @inject ICategoryService CategoryService
+@inject ImageService ImageService
+@using Microsoft.VisualBasic
+@using FinancialGoals.Client.Services
+@using ImageService = FinancialGoals.Client.Services.ImageService
 @implements IDisposable
 
 <PageTitle>Categories</PageTitle>
 <GridRow>
     <GridCol Span="3">
         <h3>Categories</h3>
+        @* <img src="@imageSource" alt="Image" /> *@
+        @* <img src="@imageSource" alt="Image" /> *@
     </GridCol>
     <GridCol>
         <div>
@@ -15,6 +21,9 @@
         </div>
     </GridCol>
 </GridRow>
+
+@* <Image Width="200px" Src="@(async (string a) => await CategoryService.GetImageUrl())" /> *@
+<img src="https://financialgoals.blob.core.windows.net/categoryicons/foods.png?sp=r&st=2023-07-16T16:02:54Z&se=2023-07-17T00:02:54Z&spr=https&sv=2022-11-02&sr=b&sig=34ZUOAYQLlJIP01Deg9RCXMIaOZOLSUng7eBzSyzLB4%3D" alt="Изображение" />
 
 @if (CategoryService.Categories == null)
 {
@@ -29,12 +38,16 @@ else
             @foreach (var category in CategoryService.Categories)
                 {
                     <GridCol Span="6">
-                        <Card Title=@(category.Name) Style="width: 300px;"
-                              Actions="@(new[] {
-                                        actionEdit(() => OpenEditForm(category.CategoryId)),
-                                        actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name))
-                                     })">
-                            <p>@category.Amount / @category.Limit</p>
+                        <Card
+                            Style="width: 300px;" Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
+                            Title=@(category.Name)
+                            Actions="@(new[] {
+                                         actionEdit(() => OpenEditForm(category.CategoryId)), 
+                                         actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })">
+                            <Divider Orientation="center">
+                                @* <img src="@convert(category.Image.ImageBytes)"/> *@
+                                @category.Amount / @category.Limit
+                            </Divider>
                         </Card>
                     </GridCol>
                 }
@@ -43,18 +56,29 @@ else
 }
 
 @code {
+    private Stream imageStream;
+    private string imageSource;
+    
     protected override async Task OnInitializedAsync()
     {
         await CategoryService.GetCategories();
         CategoryService.OnChange += StateHasChanged;
     }
 
+    private string getImageDataFromBytes(byte[] imageData)
+    {
+        string base64Image = Convert.ToBase64String(imageData);
+        return $"data:image/png;base64,{base64Image}";
+    }
+    
+    RenderFragment coverTemplate (byte[] imageData, string imageName) => 
+        @<img Style="width: 150px; margin: auto" alt="@imageName" src="@getImageDataFromBytes(imageData)" />;
+
     public void Dispose()
     {
         CategoryService.OnChange -= StateHasChanged;
     }
     
-    @* RenderFragment actionCreate(Action clickAction) =>@<Icon Type="plus" OnClick="@clickAction" />; *@
     RenderFragment actionEdit(Action clickAction) =>@<Icon Type="edit" OnClick="@clickAction" />;
     RenderFragment actionDelete(Action clickAction) =>@<Icon Type="delete" OnClick="@clickAction" />;
 
@@ -75,4 +99,14 @@ else
         modal.Show<CategoryDelete>($"Are you sure that you want to delete '{ItemName}' category?", parameters);
         // StateHasChanged();
     }
+
+    private async Task<string> test()
+    {
+        return await CategoryService.GetImageUrl();
+    }
+    
+    @* RenderFragment avatarTemplate = @<Avatar Size="50px" src="https://financialgoals.blob.core.windows.net/categoryicons/food32.png?sp=r&st=2023-07-16T16:07:24Z&se=2023-07-17T00:07:24Z&sv=2022-11-02&sr=b&sig=eajcZSQu4yReY4gS5Oge3fwahvnaFlAN4ZLfObiqT1o%3D"></Avatar>; *@
+    RenderFragment  avatarTemplate => @<Avatar Size="50px" src=""></Avatar>;
+    
+    @* RenderFragment coverTemplate = @<img Style="width: 150px; margin: auto" alt="example" src="https://financialgoals.blob.core.windows.net/categoryicons/foods.png?sp=r&st=2023-07-16T16:40:11Z&se=2023-07-17T00:40:11Z&sv=2022-11-02&sr=b&sig=3pAaeWdnEGaKZHSpazNIrsgrSMZZJ6jy4CWPwHQ6pO4%3D" />; *@
 }

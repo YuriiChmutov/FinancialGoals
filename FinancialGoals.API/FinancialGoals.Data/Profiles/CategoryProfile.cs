@@ -11,6 +11,7 @@ public class CategoryProfile : Profile
     {
         CreateMap<Category, Core.DTOs.Category.CategoryToReturn>()
             .ForMember(dest => dest.Amount, opt => opt.MapFrom<CategoryAmountResolver>())
+            .ForMember(dest => dest.Image, opt => opt.MapFrom<CategoryImageResolver>())
             .ReverseMap();
 
         CreateMap<CategoryToCreate, Category>()

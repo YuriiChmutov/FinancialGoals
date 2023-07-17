@@ -13,4 +13,5 @@ public interface ICategoryService
     CategoryToCreate CreateNewCategory();
     Task<bool> UpdateCategory(CategoryToUpdate category);
     Task DeleteCategory(int id);
+    Task<string> GetImageUrl();
 }

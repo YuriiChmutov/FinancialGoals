@@ -9,6 +9,7 @@ using AutoMapper;
 using FinancialGoals.Core.DTOs.Category;
 using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Repository.TransactionService;
+using FinancialGoals.Services;
 
 namespace FinancialGoals.API.Controllers
 {
@@ -17,14 +18,16 @@ namespace FinancialGoals.API.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
+        private readonly BlobStorageService _blobStorageService;
         private readonly ITransactionService _transactionService;
         private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryService categoryService, IMapper mapper, ITransactionService transactionService)
+        public CategoriesController(ICategoryService categoryService, IMapper mapper, ITransactionService transactionService, BlobStorageService blobStorageService)
         {
             _categoryService = categoryService;
             _mapper = mapper;
             _transactionService = transactionService;
+            _blobStorageService = blobStorageService;
         }
 
         // GET: api/Categories
@@ -56,6 +59,15 @@ namespace FinancialGoals.API.Controllers
             var categoryToReturn = _mapper.Map<CategoryToReturn>(categoryFromRepo);
         
             return categoryToReturn;
+        }
+        
+        [HttpGet("{categoryId}/image")]
+        public async Task<IActionResult> GetImage(int categoryId)
+        {
+            string imageName = "categories/food.png";
+
+            byte[] imageData = await _blobStorageService.GetImageAsync(imageName);
+            return File(imageData, "image/png");
         }
         
         // PUT: api/Categories/5
@@ -109,5 +121,7 @@ namespace FinancialGoals.API.Controllers
             await _categoryService.DeleteCategoryAsync(id);
             return NoContent();
         }
+        
+        
     }
 }

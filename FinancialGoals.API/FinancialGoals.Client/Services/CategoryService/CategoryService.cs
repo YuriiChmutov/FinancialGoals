@@ -59,4 +59,22 @@ public class CategoryService : ICategoryService
         await GetCategories();
         OnChange.Invoke();
     }
+    
+    public async Task<string> GetImageUrl()
+    {
+        string imageUrl = "https://financialgoals.blob.core.windows.net/categoryicons/foods.png"; // Замените на URL вашего изображения
+
+        // Выполнить GET-запрос для получения изображения
+        var response = await _http.GetAsync(imageUrl);
+        response.EnsureSuccessStatusCode();
+
+        // Преобразовать содержимое изображения в Base64 строку
+        byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+        string base64Image = Convert.ToBase64String(imageBytes);
+
+        // Сформировать Data URI для отображения изображения
+        string dataUri = $"data:image/jpeg;base64,{base64Image}";
+
+        return dataUri;
+    }
 }

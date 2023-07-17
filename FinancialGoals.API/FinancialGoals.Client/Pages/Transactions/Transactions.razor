@@ -15,15 +15,10 @@
             </ListItemMeta>
             <div>
                 @{
-                    if (item.Type == TransactionType.Income)
-                    {
-                        <p>+ @item.Amount</p>
-                    }
-                    else
-                    {
-                        <p>- @item.Amount</p>
-                    }
+                    var sign = (item.Type == TransactionType.Income) ? "+" : "-";
                 }
+                
+                <p>@sign @item.Amount</p>
             </div>
         </ListItem>
     </ChildContent>
