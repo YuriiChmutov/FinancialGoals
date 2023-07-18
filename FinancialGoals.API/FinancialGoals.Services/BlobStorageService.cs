@@ -18,8 +18,8 @@ public class BlobStorageService
     public async Task<string> UploadImageAsync(IFormFile file, string folderName, string fileName)
     {
         BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-        //string imageName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-        string imageName = $"{folderName}/fileName";
+        // todo add validation if file with the same name already exists
+        string imageName = $"{folderName}/{fileName}.png".ToLower().Replace(" ", string.Empty);
         BlobClient blobClient = containerClient.GetBlobClient(imageName);
 
         using (var stream = file.OpenReadStream())

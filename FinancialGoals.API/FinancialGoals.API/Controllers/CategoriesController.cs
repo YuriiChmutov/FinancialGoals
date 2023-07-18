@@ -20,9 +20,14 @@ namespace FinancialGoals.API.Controllers
         private readonly ICategoryService _categoryService;
         private readonly BlobStorageService _blobStorageService;
         private readonly ITransactionService _transactionService;
+
         private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryService categoryService, IMapper mapper, ITransactionService transactionService, BlobStorageService blobStorageService)
+        public CategoriesController(
+            ICategoryService categoryService, 
+            IMapper mapper, 
+            ITransactionService transactionService, 
+            BlobStorageService blobStorageService)
         {
             _categoryService = categoryService;
             _mapper = mapper;
@@ -102,7 +107,6 @@ namespace FinancialGoals.API.Controllers
         }
         
         // POST: api/Categories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Category>> PostCategory(CategoryToCreate newCategory)
         {
@@ -121,7 +125,5 @@ namespace FinancialGoals.API.Controllers
             await _categoryService.DeleteCategoryAsync(id);
             return NoContent();
         }
-        
-        
     }
 }

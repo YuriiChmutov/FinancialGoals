@@ -1,5 +1,6 @@
 ﻿using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
+using FinancialGoals.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinancialGoals.Data.Repository.CategoryService;

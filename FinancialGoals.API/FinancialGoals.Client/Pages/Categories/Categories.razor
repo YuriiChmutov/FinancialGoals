@@ -22,9 +22,6 @@
     </GridCol>
 </GridRow>
 
-@* <Image Width="200px" Src="@(async (string a) => await CategoryService.GetImageUrl())" /> *@
-<img src="https://financialgoals.blob.core.windows.net/categoryicons/foods.png?sp=r&st=2023-07-16T16:02:54Z&se=2023-07-17T00:02:54Z&spr=https&sv=2022-11-02&sr=b&sig=34ZUOAYQLlJIP01Deg9RCXMIaOZOLSUng7eBzSyzLB4%3D" alt="Изображение" />
-
 @if (CategoryService.Categories == null)
 {
     <p>
