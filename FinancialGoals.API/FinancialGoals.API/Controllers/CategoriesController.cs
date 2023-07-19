@@ -86,7 +86,7 @@ namespace FinancialGoals.API.Controllers
             }
 
             var categoryToUpdate = _mapper.Map<Category>(modifiedCategory);
-            
+
             try
             {
                 await _categoryService.UpdateCategoryAsync(id, categoryToUpdate);

@@ -9,6 +9,7 @@
 @inject HttpClient Http
 @inject ICategoryService CategoryService
 @inject IMapper Mapper
+@inject IMessageService _message
 
 @if (categoryModified == null)
 {
@@ -32,6 +33,27 @@ else
         <FormItem Label="Limit" ShowFeedbackOnError="true">
             <AntDesign.InputNumber @bind-Value="@context.Limit" />
         </FormItem>
+        
+        <Upload Action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                Name="avatar"
+                Class="avatar-uploader"
+                ListType="picture-card"
+                ShowUploadList="false"
+                BeforeUpload="BeforeUpload"
+                OnChange="HandleChange"
+                >
+            @if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                <img src="@imageUrl" alt="avatar" style="width: 100%"/>
+            }
+            else
+            {
+                <div>
+                    <Icon Spin="loading" Type="@(loading?"Loading":"plus")" ></Icon>
+                    <div className="ant-upload-text">Upload</div>
+                </div>
+            }
+        </Upload>
 
         <Divider Orientation="right">
             <Button Type="@ButtonType.Primary" HtmlType="submit" @onclick="UpdateItem">
@@ -49,25 +71,87 @@ else
     [Parameter] public int ItemId { get; set; }
     
     private CategoryToUpdate categoryModified;
+    string imageUrl;
+    bool loading = false;
+    string originalName;
 
     protected override async Task OnInitializedAsync()
     {
         var categoryToReturn = await Http.GetFromJsonAsync<CategoryToReturn>($"https://localhost:7128/api/Categories/{ItemId}");
         categoryModified = Mapper.Map<CategoryToUpdate>(categoryToReturn);
+        
+        imageUrl = getImageDataFromBytes(categoryToReturn.Image.ImageBytes);
+        originalName = categoryToReturn.Name;
+        categoryModified.File = new UploadedFileModel
+        {
+            Name = categoryToReturn.Image.ImageName,
+            Type = "application/octet-stream",
+            Size = categoryToReturn.Image.ImageBytes.Length,
+            Data = await GetFileData(imageUrl)
+        };
+
+        categoryModified.Changed = new CategoryWhatWasChanged();
     }
     
-    // private Category editItem = new Category();
-
-    private void EditItem(long id)
+    bool BeforeUpload(UploadFileItem file)
     {
-        //editItem = todoItems.Single(i => i.Id == id);
+        var isJpgOrPng = file.Type == "image/jpeg" || file.Type == "image/png";
+        if (!isJpgOrPng)
+        {
+            _message.Error("You can only upload JPG/PNG file!");
+        }
+        var isLt2M = file.Size / 1024 / 1024 < 2;
+        if (!isLt2M)
+        {
+            _message.Error("Image must smaller than 2MB!");
+        }
+        return isJpgOrPng && isLt2M;
+    }
+    
+    async void HandleChange(UploadInfo fileinfo) // todo change to Task
+    {
+        if (fileinfo.File.State == UploadState.Success)
+        {
+            imageUrl = fileinfo.File.ObjectURL;
+            
+            var uploadedFile = new UploadedFileModel
+            {
+                Name = fileinfo.File.FileName,
+                Type = fileinfo.File.Type,
+                Size = fileinfo.File.Size,
+                Data = await GetFileData(fileinfo.File.ObjectURL)
+            };
+    
+            categoryModified.File = uploadedFile;
+            categoryModified.Changed.Image = true;
+        }
+        
+        InvokeAsync(StateHasChanged);
     }
     
     private async Task Close() => await BlazoredModal.CloseAsync();
 
     private async Task UpdateItem()
     {
+        if (originalName != categoryModified.Name)
+        {
+            categoryModified.Changed.Name = true;
+        }
         var result = await CategoryService.UpdateCategory(categoryModified);
         if (result) await BlazoredModal.CloseAsync();
+    }
+    
+    private string getImageDataFromBytes(byte[] imageData)
+    {
+        string base64Image = Convert.ToBase64String(imageData);
+        return $"data:image/png;base64,{base64Image}";
+    }
+    
+    private async Task<byte[]> GetFileData(string objectURL)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            return await httpClient.GetByteArrayAsync(objectURL);
+        }
     }
 }

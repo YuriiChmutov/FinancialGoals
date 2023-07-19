@@ -22,6 +22,7 @@ public class CategoryProfile : Profile
         
         CreateMap<CategoryToUpdate, Category>()
             //.ForMember(m => m.CategoryId, options => options.Ignore())
-            .ForMember(m => m.Transactions, options => options.Ignore());
+            .ForMember(m => m.Transactions, options => options.Ignore())
+            .ForMember(dest => dest.ImageName, opt => opt.MapFrom<CategoryImageNameResolver>());
     }
 }

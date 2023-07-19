@@ -94,16 +94,5 @@ else
     {
         var parameters = new ModalParameters().Add(nameof(CategoriesEdit.ItemId), ItemId);
         modal.Show<CategoryDelete>($"Are you sure that you want to delete '{ItemName}' category?", parameters);
-        // StateHasChanged();
     }
-
-    private async Task<string> test()
-    {
-        return await CategoryService.GetImageUrl();
-    }
-    
-    @* RenderFragment avatarTemplate = @<Avatar Size="50px" src="https://financialgoals.blob.core.windows.net/categoryicons/food32.png?sp=r&st=2023-07-16T16:07:24Z&se=2023-07-17T00:07:24Z&sv=2022-11-02&sr=b&sig=eajcZSQu4yReY4gS5Oge3fwahvnaFlAN4ZLfObiqT1o%3D"></Avatar>; *@
-    RenderFragment  avatarTemplate => @<Avatar Size="50px" src=""></Avatar>;
-    
-    @* RenderFragment coverTemplate = @<img Style="width: 150px; margin: auto" alt="example" src="https://financialgoals.blob.core.windows.net/categoryicons/foods.png?sp=r&st=2023-07-16T16:40:11Z&se=2023-07-17T00:40:11Z&sv=2022-11-02&sr=b&sig=3pAaeWdnEGaKZHSpazNIrsgrSMZZJ6jy4CWPwHQ6pO4%3D" />; *@
 }

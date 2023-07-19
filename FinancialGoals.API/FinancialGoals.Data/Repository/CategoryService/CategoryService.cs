@@ -27,7 +27,7 @@ public class CategoryService : ICategoryService
 
     public async Task<Category?> GetCategoryAsync(int id)
     {
-        return await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == id);
+        return await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.CategoryId == id);
     }
 
     public async Task AddCategoryAsync(Category category)

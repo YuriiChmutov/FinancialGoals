@@ -50,4 +50,38 @@ public class BlobStorageService
             return memoryStream.ToArray();
         }
     }
+
+    public async Task<bool> DeleteImageAsync(string imageName)
+    {
+        BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+        BlobClient blobClient = containerClient.GetBlobClient(imageName);
+
+        return await blobClient.DeleteIfExistsAsync();
+    }
+    
+    public async Task<string> RenameImageAsync(string folderName, string currentImageName, string newImageName)
+    {
+        string fullCurrentImageName = $"{folderName}/{currentImageName}.png".ToLower().Replace(" ", string.Empty);
+        string fullNewImageName = $"{folderName}/{newImageName}.png".ToLower().Replace(" ", string.Empty);
+        BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+        BlobClient currentBlobClient = containerClient.GetBlobClient(fullCurrentImageName);
+        BlobClient newBlobClient = containerClient.GetBlobClient(fullNewImageName);
+
+        if (await currentBlobClient.ExistsAsync())
+        {
+            if (await newBlobClient.ExistsAsync())
+            {
+                // string uniqueNewImageName = GenerateUniqueImageName(newImageName);
+                newBlobClient = containerClient.GetBlobClient(newImageName);
+            }
+
+            await newBlobClient.StartCopyFromUriAsync(currentBlobClient.Uri);
+
+            await currentBlobClient.DeleteIfExistsAsync();
+
+            return newBlobClient.Name;
+        }
+
+        return currentImageName;
+    }
 }
