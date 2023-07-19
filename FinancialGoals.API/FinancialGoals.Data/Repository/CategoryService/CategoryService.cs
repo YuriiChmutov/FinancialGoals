@@ -8,11 +8,13 @@ namespace FinancialGoals.Data.Repository.CategoryService;
 public class CategoryService : ICategoryService
 {
     private readonly FinancialDbContext _context;
+    private readonly BlobStorageService _blobStorageService;
 
-    public CategoryService(FinancialDbContext context)
+    public CategoryService(FinancialDbContext context, BlobStorageService blobStorageService)
     {
         _context = context ??
                    throw new ArgumentNullException(nameof(context));
+        _blobStorageService = blobStorageService;
     }
 
     public async Task<List<Category>> GetCategoriesAsync()
@@ -45,6 +47,7 @@ public class CategoryService : ICategoryService
     public async Task DeleteCategoryAsync(int id)
     {
         var category = await _context.Categories.FindAsync(id);
+        await _blobStorageService.DeleteImageAsync(category.ImageName);
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
     }
