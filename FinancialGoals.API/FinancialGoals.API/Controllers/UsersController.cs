@@ -1,5 +1,9 @@
-﻿using FinancialGoals.Core.Models;
+﻿using FinancialGoals.Core.DTOs.User;
+using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
+using FinancialGoals.Data.Repository;
+using FinancialGoals.Data.Repository.AuthService;
+using FinancialGoals.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +13,12 @@ namespace FinancialGoals.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly IAuthService _authService;
         private readonly FinancialDbContext _context;
 
-        public UsersController(FinancialDbContext context)
+        public UsersController(IAuthService authService, FinancialDbContext context)
         {
+            _authService = authService;
             _context = context;
         }
 
@@ -79,17 +85,24 @@ namespace FinancialGoals.API.Controllers
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        [HttpPost("register")]
+        public async Task<ActionResult<ServiceResponse<int>>> PostUser(UserRegister request)
         {
-          if (_context.Users == null)
-          {
-              return Problem("Entity set 'FinancialDbContext.Users'  is null.");
-          }
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var user = new User
+            {
+                Email = request.Email,
+                Role = UserRole.User,
+                FirstName = request.FirstName,
+                SecondName = request.SecondName
+                // PhoneNumber = request.PhoneNumber,
+                // Gender = request.Gender
+            };
+          
+            var response = await _authService.Register(user, request.Password);
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            if (!response.Success) return BadRequest(response);
+
+            return Ok(response);
         }
 
         // DELETE: api/Users/5

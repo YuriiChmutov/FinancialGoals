@@ -8,4 +8,11 @@
         Guest,
         PremiumUser
     }
+
+    public enum UserGender
+    {
+        Female,
+        Male,
+        Other
+    }
 }

@@ -9,9 +9,13 @@ namespace FinancialGoals.Core.Models
         public string FirstName { get; set; }
         public string SecondName { get; set; }
         public string Email { get; set; }
-        public DateTime? BirthDate { get; set; }
-        public string Password { get; set; }
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
+        public DateTime DateCreated { get; set; } = DateTime.Now;
         public List<FinancialAccount>? FinancialAccounts { get; set;}
         public UserRole Role { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public UserGender? Gender { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 }

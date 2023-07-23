@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
 using Azure.Storage.Blobs;
+using FinancialGoals.Data.Repository.AuthService;
 using FinancialGoals.Data.Repository.CategoryService;
 using FinancialGoals.Data.Repository.TransactionService;
 using FinancialGoals.Data.Resolvers;
@@ -28,6 +29,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<CategoryAmountResolver>();
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 //builder.Services.AddSwaggerGen(c => c.AddSwaggerApiKeySecurity());
