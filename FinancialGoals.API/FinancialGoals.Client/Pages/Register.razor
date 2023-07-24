@@ -2,6 +2,9 @@
 @using FinancialGoals.Core.DTOs.User
 
 @inject IAuthService AuthService
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Register</PageTitle>
 
@@ -54,7 +57,7 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="submit" class="btn btn-primary col-md-12">Register</button>
         <div class="text-danger">
             <span>@message</span>
         </div>
@@ -68,14 +71,24 @@
     string message = string.Empty;
     string messageCssClass = string.Empty;
     
-    
-    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
     
     async Task HandleRegistration()
     {
-        var result = await AuthService.Register(user);
-        message = result.Message;
-        messageCssClass = result.Success ? "text-success" : "text-danger";
+        var response = await AuthService.Register(user);
+        message = response.Message;
+
+        if (response.Success)
+        {
+            messageCssClass = "text-success";
+            
+            await LocalStorage.SetItemAsync("authToken", response.Data);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            // await BlazoredModal.CloseAsync();
+            // NavigationManager.NavigateTo("");
+        }
+        messageCssClass = "text-danger";
         // if (result.Success) await BlazoredModal.CloseAsync();
     }
 }

@@ -1,6 +1,8 @@
 ﻿@using FinancialGoals.Client.Pages
 @inject IModalService modal
-
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 <div class="dropdown">
     <button @onclick="ToggleUserMenu"
@@ -9,9 +11,17 @@
         <i class="oi oi-person"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-sm-end @UserMenuCssClass">
-        @* <a href="register" class="dropdown-item">Register</a> *@
-        <li><div class="dropdown-item" @onclick="@(OpenRegisterForm)">Register</div></li>
-        <li><div class="dropdown-item" @onclick="@(OpenRegisterForm)">Register</div></li>
+        <AuthorizeView>
+            <Authorized>
+                <li><button class="dropdown-item" @onclick="Logout">Logout</button></li>
+                <li><a href="profile" class="dropdown-item">Profile</a></li>
+            </Authorized>
+            <NotAuthorized>
+                <li><button class="dropdown-item" @onclick="@(OpenRegisterForm)">Register</button></li>
+                <li><button class="dropdown-item" @onclick="@(OpenLoginForm)">Login</button></li>
+            </NotAuthorized>
+        </AuthorizeView>
+        
     </ul>
 </div>
 
@@ -34,5 +44,17 @@
     private void OpenRegisterForm()
     {
         modal.Show<Register>("Register");
+    }
+
+    private void OpenLoginForm()
+    {
+        modal.Show<Login>("Login");
+    }
+
+    private async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync("authToken");
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        NavigationManager.NavigateTo("");
     }
 }

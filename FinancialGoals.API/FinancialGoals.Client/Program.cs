@@ -1,3 +1,6 @@
+global using Microsoft.AspNetCore.Components.Authorization;
+
+using Blazored.LocalStorage;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -17,9 +20,14 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ImageService>();
 
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddAntDesign();
 builder.Services.AddBlazoredModal();
+builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

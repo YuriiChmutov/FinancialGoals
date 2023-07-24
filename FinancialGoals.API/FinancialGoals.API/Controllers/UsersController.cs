@@ -86,7 +86,7 @@ namespace FinancialGoals.API.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("register")]
-        public async Task<ActionResult<ServiceResponse<int>>> PostUser(UserRegister request)
+        public async Task<ActionResult<ServiceResponse<string>>> PostUser(UserRegister request)
         {
             var user = new User
             {
@@ -100,6 +100,16 @@ namespace FinancialGoals.API.Controllers
           
             var response = await _authService.Register(user, request.Password);
 
+            if (!response.Success) return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<ServiceResponse<string>>> Login(UserLogin request)
+        {
+            var response = await _authService.Login(request.Email, request.Password);
+            
             if (!response.Success) return BadRequest(response);
 
             return Ok(response);

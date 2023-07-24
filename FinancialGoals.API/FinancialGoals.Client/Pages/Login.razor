@@ -1,0 +1,64 @@
+﻿@page "/login"
+@using FinancialGoals.Core.DTOs.User
+
+@inject IAuthService AuthService
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Login</PageTitle>
+
+<div class="container py-5 h-100">
+    <EditForm Model="user" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator/>
+        
+        <div class="form-outline mb-4">
+            <label for="email">Email</label>
+            <InputText id="email" @bind-Value="user.Email" class="form-control"/>
+            <ValidationMessage For="@(() => user.Email)"/>
+        </div>
+        
+        <div class="form-outline mb-4">
+            <label for="password">Password</label>
+            <InputText id="password" @bind-Value="user.Password" class="form-control" type="password"/>
+            <ValidationMessage For="@(() => user.Password)"/>
+        </div>
+        
+        <button type="submit" class="btn btn-primary col-md-12 mb-4">Login</button>
+        
+        <div class="text-danger">
+            <span>@message</span>
+        </div>
+    </EditForm>
+    <div class="text-danger">
+        <span>@errorMessage</span>
+    </div>
+</div>
+
+@code {
+    private UserLogin user = new UserLogin();
+    
+    private string message = string.Empty;
+    private string errorMessage = string.Empty;
+    
+    [CascadingParameter] 
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    private async Task HandleLogin()
+    {
+        var response = await AuthService.Login(user);
+        if (response.Success)
+        {
+            errorMessage = string.Empty;
+
+            await LocalStorage.SetItemAsync("authToken", response.Data);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            await BlazoredModal.CloseAsync();
+            NavigationManager.NavigateTo("");
+        }
+        else
+        {
+            errorMessage = response.Message;
+        }
+    }
+}
