@@ -84,35 +84,17 @@ namespace FinancialGoals.API.Controllers
         }
 
         // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("register")]
-        public async Task<ActionResult<ServiceResponse<string>>> PostUser(UserRegister request)
+        [HttpPost]
+        public async Task<ActionResult<User>> PostUser(User user)
         {
-            var user = new User
+            if (_context.Users == null)
             {
-                Email = request.Email,
-                Role = UserRole.User,
-                FirstName = request.FirstName,
-                SecondName = request.SecondName
-                // PhoneNumber = request.PhoneNumber,
-                // Gender = request.Gender
-            };
-          
-            var response = await _authService.Register(user, request.Password);
+                return Problem("Entity set 'FinancialDbContext.Users'  is null.");
+            }
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
 
-            if (!response.Success) return BadRequest(response);
-
-            return Ok(response);
-        }
-
-        [HttpPost("login")]
-        public async Task<ActionResult<ServiceResponse<string>>> Login(UserLogin request)
-        {
-            var response = await _authService.Login(request.Email, request.Password);
-            
-            if (!response.Success) return BadRequest(response);
-
-            return Ok(response);
+            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
         }
 
         // DELETE: api/Users/5

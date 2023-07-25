@@ -14,4 +14,5 @@ public interface ICategoryService
     Task<bool> UpdateCategory(CategoryToUpdate category);
     Task DeleteCategory(int id);
     Task<string> GetImageUrl();
+    Task Clean();
 }

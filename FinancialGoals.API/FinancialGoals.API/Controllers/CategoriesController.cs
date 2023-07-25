@@ -1,4 +1,5 @@
-﻿using FinancialGoals.API.Filters;
+﻿using System.Security.Claims;
+using FinancialGoals.API.Filters;
 using FinancialGoals.Core.DTOs;
 using FinancialGoals.Data.Data;
 using FinancialGoals.Data.Repository.CategoryService;
@@ -37,10 +38,12 @@ namespace FinancialGoals.API.Controllers
 
         // GET: api/Categories
         [HttpGet]
+        [Authorize]
         //[TypeFilter(typeof(ApiKeyAttribute))]
         public async Task<ActionResult<IEnumerable<CategoryToReturn>>> GetCategories()
         {
-            var categoriesFromRepo = await _categoryService.GetCategoriesAsync();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var categoriesFromRepo = await _categoryService.GetCategoriesByUserIdAsync(int.Parse(userId));
 
             var categoriesToReturn = _mapper.Map<List<CategoryToReturn>>(categoriesFromRepo);
             
@@ -108,10 +111,12 @@ namespace FinancialGoals.API.Controllers
         
         // POST: api/Categories
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Category>> PostCategory(CategoryToCreate newCategory)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var category = _mapper.Map<Core.Models.Category>(newCategory);
-            await _categoryService.AddCategoryAsync(category);
+            await _categoryService.AddCategoryByUserIdAsync(category, Int32.Parse(userId));
 
             var categoryToReturn = _mapper.Map<Category>(category);
             

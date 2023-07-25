@@ -73,4 +73,9 @@ public class CategoryService : ICategoryService
         string dataUri = $"data:image/jpeg;base64,{base64Image}";
         return dataUri;
     }
+
+    public async Task Clean()
+    {
+        Categories = null;
+    }
 }

@@ -17,5 +17,11 @@ namespace FinancialGoals.Core.Models
         public DateTime? BirthDate { get; set; }
         public UserGender? Gender { get; set; }
         public string? PhoneNumber { get; set; }
+        public List<Category>? Categories { get; set; }
+
+        public User()
+        {
+            Categories = new List<Category>();
+        }
     }
 }

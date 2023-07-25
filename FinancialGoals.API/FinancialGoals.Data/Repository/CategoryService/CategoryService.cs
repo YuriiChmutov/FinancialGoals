@@ -22,6 +22,15 @@ public class CategoryService : ICategoryService
         return await _context.Categories.ToListAsync();
     }
 
+    public async Task<List<Category>> GetCategoriesByUserIdAsync(int userId)
+    {
+        var userCategories = await _context.Users
+            .Include(u => u.Categories)
+            .FirstOrDefaultAsync(u => u.UserId == userId);
+
+        return userCategories.Categories;
+    }
+
     public async Task<bool> CategoryExistsAsync(int id)
     {
         return await _context.Categories.AnyAsync(c => c.CategoryId == id);
@@ -37,12 +46,25 @@ public class CategoryService : ICategoryService
         _context.Categories.Add(category);
         await _context.SaveChangesAsync();
     }
+    
+    public async Task AddCategoryByUserIdAsync(Category category, int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        category.Users.Add(user);
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+    }
 
     public async Task UpdateCategoryAsync(int id, Category category)
     {
         _context.Entry(category).State = EntityState.Modified;
         await _context.SaveChangesAsync();
     }
+
+    // public async Task UpdateCategoryByUserIdAsync(int categoryId, Category category, int userId)
+    // {
+    //     
+    // }
 
     public async Task DeleteCategoryAsync(int id)
     {

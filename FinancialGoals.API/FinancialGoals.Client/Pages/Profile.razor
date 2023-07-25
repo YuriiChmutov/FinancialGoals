@@ -1,12 +1,25 @@
 ﻿@page "/profile"
+@inject IModalService modal
 @attribute [Authorize]
 
 <AuthorizeView>
     <h3>
         You're logged in with <i>@context.User.Identity.Name</i>
     </h3>
+    
+    <h5>
+        <span style="cursor: pointer; color: #0a58ca" @onclick="OpenChangePasswordForm">
+            Change
+        </span>
+        <span>
+            password
+        </span>
+    </h5>
 </AuthorizeView>
 
 @code {
-    
+    private void OpenChangePasswordForm()
+    {
+        modal.Show<ChangePassword>("Change password");
+    }
 }

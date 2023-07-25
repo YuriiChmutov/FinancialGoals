@@ -31,7 +31,6 @@ builder.Services.AddScoped<CategoryAmountResolver>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-
 //builder.Services.AddSwaggerGen(c => c.AddSwaggerApiKeySecurity());
 
 builder.Services.AddSwaggerGen(c => c.AddSwaggerJWTSecurity());
@@ -46,13 +45,8 @@ builder.Services.AddSwaggerGen(c => c.AddSwaggerJWTSecurity());
 //        };
 //    });
 
-var configuration = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json")
-    .Build();
-
 string blobStorageConnection =
-    configuration.GetConnectionString("BlobStorageConnection");
+    builder.Configuration.GetConnectionString("BlobStorageConnection");
 string containerName = "categoryicons";
 
 builder.Services.AddSingleton(x => 
@@ -60,22 +54,36 @@ builder.Services.AddSingleton(x =>
 builder.Services.AddScoped<BlobStorageService>(x => 
     new BlobStorageService(x.GetService<BlobServiceClient>(), containerName));
 
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(o =>
-    {
-        o.TokenValidationParameters = new TokenValidationParameters
+    .AddJwtBearer(opt =>
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = "your-issuer",
-            ValidAudience = "your-audience",
-            IssuerSigningKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("TokenKey").Value))
-        };
-    });
+            opt.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = 
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                        builder.Configuration.GetSection("AppSettings:Token").Value)),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        }
+    );
+
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(o =>
+//     {
+//         o.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateLifetime = true,
+//             ValidateIssuerSigningKey = true,
+//             ValidIssuer = "your-issuer",
+//             ValidAudience = "your-audience",
+//             IssuerSigningKey =
+//                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("TokenKey").Value))
+//         };
+//     });
 
 builder.Services.AddDbContext<FinancialDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("FinancialGoalsConnection"))
