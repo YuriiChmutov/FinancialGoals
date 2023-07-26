@@ -1,5 +1,14 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+@font-face {
+    font-family: 'EightBitsFont';
+    /*src: url(../EightBits.ttf);*/
+    /*src: url(../ZlusaFont.ttf);*/
+    src: url(../bionicle-training-card-font-2-4.ttf);
+    font-weight: normal;
+    font-style: normal;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -99,3 +108,14 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+.custom-modal-overlay {
+    background-color: #0c4128;
+    font-family: "EightBitsFont";
+    color: gold;
+}
+    
+/*.bm-title {*/
+/*    font-family: EightBitsFont;*/
+/*    background-color: #1b6ec2;*/
+/*}*/    

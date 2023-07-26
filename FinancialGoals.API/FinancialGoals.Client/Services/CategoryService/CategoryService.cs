@@ -19,6 +19,8 @@ public class CategoryService : ICategoryService
     
     public async Task GetCategories()
     {
+        // var data = await _http.GetFromJsonAsync<List<CategoryToReturn>>("https://localhost:7128/api/Categories");
+        // Categories = data ?? new List<CategoryToReturn>();
         Categories = await _http.GetFromJsonAsync<List<CategoryToReturn>>("https://localhost:7128/api/Categories");
     }
 

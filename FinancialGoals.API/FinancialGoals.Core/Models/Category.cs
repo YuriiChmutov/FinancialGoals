@@ -7,11 +7,11 @@
         public decimal Limit { get; set; }
         public string? ImageName { get; set; }
         public List<Transaction>? Transactions { get; set; }
-        public List<User> Users { get; set; }
+        public List<FinancialAccount> FinancialAccounts { get; set; }
 
         public Category()
         {
-            Users = new List<User>();
+            FinancialAccounts = new List<FinancialAccount>();
         }
     }
 }

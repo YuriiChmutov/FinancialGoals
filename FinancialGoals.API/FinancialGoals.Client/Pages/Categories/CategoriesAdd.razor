@@ -12,34 +12,35 @@
       LabelColSpan="4"
       WrapperColSpan="18">
     <DataAnnotationsValidator/>
-    <FormItem Label="Name" ShowFeedbackOnError="true">
+    <FormItem ShowFeedbackOnError="true">
+        <label for="" style="font-family: EightBitsFont">Name</label>
         <Input @bind-Value="@context.Name"/>
     </FormItem>
-    <FormItem Label="Limit" ShowFeedbackOnError="true">
-        <AntDesign.InputNumber @bind-Value="@context.Limit" />
+    <FormItem Label="Limit" ShowFeedbackOnError="true" Style="font-family: EightBitsFont">
+        <AntDesign.InputNumber @bind-Value="@context.Limit" Style="font-family: EightBitsFont; border-radius: 5px"/>
     </FormItem>
-    
+            
     <Upload Action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                Name="avatar"
-                Class="avatar-uploader"
-                ListType="picture-card"
-                ShowUploadList="false"
-                BeforeUpload="BeforeUpload"
-                OnChange="HandleChange">
-            @if (!string.IsNullOrWhiteSpace(imageUrl))
-            {
-                <img src="@imageUrl" alt="avatar" style="width: 100%" />
-            }
-            else
-            {
-                <div>
-                    <Icon Spin="loading" Type="@(loading?"Loading":"plus")" ></Icon>
-                    <div className="ant-upload-text">Upload</div>
-                </div>
-            }
-        </Upload>
-    
-
+            Name="avatar"
+            Class="avatar-uploader"
+            ListType="picture-card"
+            ShowUploadList="false"
+            BeforeUpload="BeforeUpload"
+            OnChange="HandleChange">
+        @if (!string.IsNullOrWhiteSpace(imageUrl))
+        {
+            <img src="@imageUrl" alt="avatar" style="width: 100%" />
+        }
+        else
+        {
+            <div>
+                <Icon Spin="loading" Type="@(loading?"Loading":"plus")" ></Icon>
+                <div className="ant-upload-text">Upload</div>
+            </div>
+        }
+    </Upload>
+            
+            
     <Divider Orientation="right">
         <Button Color="@Color.Green6" Type="@ButtonType.Primary" HtmlType="submit" @onclick="CreateCategory">
             Create
@@ -58,7 +59,7 @@
     private async Task CreateCategory()
     {
         var result = await CategoryService.AddCategory(categoryToCreate);
-        if (result) await BlazoredModal.CloseAsync();    
+        if (result) await BlazoredModal.CloseAsync(ModalResult.Ok($"{categoryToCreate.Name} category was created successfully!"));    
     }
     
     private async Task Close() => await BlazoredModal.CloseAsync();

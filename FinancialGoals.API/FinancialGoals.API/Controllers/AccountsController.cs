@@ -7,25 +7,43 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
+using FinancialGoals.Core.DTOs.Account;
+using FinancialGoals.Data.Repository.AccountService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinancialGoals.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountsController : ControllerBase
     {
         private readonly FinancialDbContext _context;
+        private readonly IAccountService _accountService;
+        private readonly IMapper _mapper;
 
-        public AccountController(FinancialDbContext context)
+
+        public AccountsController(
+            FinancialDbContext context, 
+            IAccountService accountService, 
+            IMapper mapper)
         {
             _context = context;
+            _accountService = accountService;
+            _mapper = mapper;
         }
 
-        // GET: api/<AccountController>
+        // GET: api/accounts
         [HttpGet]
-        public IEnumerable<string> Get()
+        // [Authorize]
+        public async Task<ActionResult<IEnumerable<AccountToReturn>>> Get()
         {
-            return new string[] { "value1", "value2" };
+            // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // var accountsFromRepo = await _accountService.GetUserAccountsAsync(int.Parse(userId));
+            var accountsFromRepo = await _accountService.GetUserAccountsAsync(5);
+
+            var accountsToReturn = _mapper.Map<List<AccountToReturn>>(accountsFromRepo);
+            return Ok(accountsToReturn);
         }
 
         // GET api/<AccountController>/5

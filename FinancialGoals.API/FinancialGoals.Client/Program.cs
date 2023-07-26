@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using FinancialGoals.Client;
 using FinancialGoals.Client.CategoryService;
 using FinancialGoals.Client.Services;
+using FinancialGoals.Client.Services.AccountService;
 using FinancialGoals.Client.Services.AuthService;
 using FinancialGoals.Client.Services.TransactionService;
 
@@ -18,6 +19,7 @@ builder.Services.AddScoped(sp => new HttpClient {BaseAddress = new Uri(builder.H
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ImageService>();
 
 builder.Services.AddOptions();

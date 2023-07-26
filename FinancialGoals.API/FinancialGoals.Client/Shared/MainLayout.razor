@@ -1,18 +1,46 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
+@* <div class="page"> *@
+@*     <div class="sidebar"> *@
+@*         <NavMenu/> *@
+@*     </div> *@
+@* *@
+@*     <main> *@
+@*         <div class="top-row px-4"> *@
+@*             <UserButton/> *@
+@*             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a> *@
+@*         </div> *@
+@* *@
+@*         <article class="content px-4"> *@
+@*             @Body *@
+@*         </article> *@
+@*     </main> *@
+@* </div> *@
 
-    <main>
-        <div class="top-row px-4">
-            <UserButton/>
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<Layout>
+    <Header>
+        <GridRow>
+            <GridCol Span="23" Style="font-family: EightBitsFont; color: gold; font-size: 28px">
+                <img style="width: 32px" src="images/polka-dot-gold-coin.png"/>
+                FinancialGoals
+            </GridCol>
+            @* <GridCol Span="13"></GridCol> *@
+            
+            <GridCol Span="1"><UserButton/></GridCol>
+            @* <GridCol Span="2"><a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a></GridCol> *@
+        </GridRow>
+    </Header>
+    <Layout>
+        <Sider>
+            <NavMenu/>
+        </Sider>
+        <Content>
+            <article class="content px-4">
+                @Body
+            </article>
+        </Content>
+    </Layout>
+    @* <Footer> *@
+    @*     Footer *@
+    @* </Footer> *@
+</Layout>

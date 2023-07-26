@@ -6,8 +6,13 @@
 @using Microsoft.VisualBasic
 @using FinancialGoals.Client.Services
 @using ImageService = FinancialGoals.Client.Services.ImageService
+@using ModalOptions = Blazored.Modal.ModalOptions
 @implements IDisposable
 
+@if (!string.IsNullOrWhiteSpace(alertMessage))
+{
+    <Alert Type="@AlertType.Success" Message="@alertMessage" Closable Style="font-family: EightBitsFont"/>
+}
 <PageTitle>Categories</PageTitle>
 <GridRow>
     <GridCol Span="3">
@@ -52,9 +57,16 @@ else
     </div>
 }
 
+@* <style> *@
+@*     .custom-modal-overlay{ *@
+@*         color: #0b5ed7; *@
+@*     } *@
+@* </style> *@
+
 @code {
     private Stream imageStream;
     private string imageSource;
+    private string alertMessage = string.Empty;
     
     protected override async Task OnInitializedAsync()
     {
@@ -79,9 +91,23 @@ else
     RenderFragment actionEdit(Action clickAction) =>@<Icon Type="edit" OnClick="@clickAction" />;
     RenderFragment actionDelete(Action clickAction) =>@<Icon Type="delete" OnClick="@clickAction" />;
 
-    private void OpenCreateForm()
+    private async Task OpenCreateForm()
     {
-        modal.Show<CategoriesAdd>("Create category");
+        var options = new ModalOptions() 
+        { 
+            OverlayCustomClass = "custom-modal-overlay"
+        };
+        
+        var parameters = new ModalParameters().Add("message", alertMessage);
+        
+        var message = modal.Show<CategoriesAdd>("Create category");
+        var result = await message.Result;
+
+        if (result.Confirmed)
+        {
+            alertMessage = result.Data.ToString();
+            StateHasChanged();
+        }
     }
     
     private void OpenEditForm(int ItemId)

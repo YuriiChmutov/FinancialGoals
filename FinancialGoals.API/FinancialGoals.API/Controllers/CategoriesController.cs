@@ -16,6 +16,7 @@ namespace FinancialGoals.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -38,12 +39,12 @@ namespace FinancialGoals.API.Controllers
 
         // GET: api/Categories
         [HttpGet]
-        [Authorize]
         //[TypeFilter(typeof(ApiKeyAttribute))]
         public async Task<ActionResult<IEnumerable<CategoryToReturn>>> GetCategories()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var categoriesFromRepo = await _categoryService.GetCategoriesByUserIdAsync(int.Parse(userId));
+            var categoriesFromRepo = 
+                await _categoryService.GetCategoriesByUserIdAsync(int.Parse(userId), 2);
 
             var categoriesToReturn = _mapper.Map<List<CategoryToReturn>>(categoriesFromRepo);
             

@@ -22,13 +22,13 @@ public class CategoryService : ICategoryService
         return await _context.Categories.ToListAsync();
     }
 
-    public async Task<List<Category>> GetCategoriesByUserIdAsync(int userId)
+    public async Task<List<Category>> GetCategoriesByUserIdAsync(int userId, int financialAccountId)
     {
-        var userCategories = await _context.Users
-            .Include(u => u.Categories)
-            .FirstOrDefaultAsync(u => u.UserId == userId);
+        var data = await _context.FinancialAccounts
+            .Include(acc => acc.Categories)
+            .FirstOrDefaultAsync(x => x.FinancialAccountId == financialAccountId && x.UserId == userId);
 
-        return userCategories.Categories;
+        return data != null ? data.Categories : new List<Category>();
     }
 
     public async Task<bool> CategoryExistsAsync(int id)
@@ -49,8 +49,9 @@ public class CategoryService : ICategoryService
     
     public async Task AddCategoryByUserIdAsync(Category category, int userId)
     {
-        var user = await _context.Users.FindAsync(userId);
-        category.Users.Add(user);
+        var account = await _context.FinancialAccounts
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.FinancialAccountId == 2); // todo: add financialAccountId
+        category.FinancialAccounts.Add(account);
         _context.Categories.Add(category);
         await _context.SaveChangesAsync();
     }
