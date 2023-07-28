@@ -19,6 +19,7 @@ public class AccountService : IAccountService
     public async Task<List<FinancialAccount>> GetUserAccountsAsync(int userId)
     {
         return await _context.FinancialAccounts
+            .Include(x => x.Categories)
             .Where(acc => acc.UserId == userId).ToListAsync();
     }
 
@@ -34,8 +35,9 @@ public class AccountService : IAccountService
             .FirstOrDefaultAsync(acc => acc.FinancialAccountId == accountId);
     }
 
-    public async Task AddAccountAsync(FinancialAccount account)
+    public async Task AddAccountAsync(FinancialAccount account, int userId)
     {
+        account.UserId = userId;
         _context.FinancialAccounts.Add(account);
         await _context.SaveChangesAsync();
     }
@@ -51,5 +53,10 @@ public class AccountService : IAccountService
         var account = await _context.FinancialAccounts.FindAsync(accountId);
         _context.FinancialAccounts.Remove(account);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<int> GetAmountOfUsersCurrencyAccounts(int userId, CurrencyType currencyType)
+    {
+        return _context.FinancialAccounts.Count(x => x.UserId == userId && x.Currency == currencyType);
     }
 }

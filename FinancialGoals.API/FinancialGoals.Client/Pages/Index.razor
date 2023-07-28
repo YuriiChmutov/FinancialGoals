@@ -14,16 +14,20 @@
 }
 else
 {
-    <Segmented Block Labels=@(new[] {AccountService.Accounts[0].Name, AccountService.Accounts[1].Name}) />
+    <Segmented Block Labels=@financialAccountsNames />
 }
-@* <Segmented Block Labels=@(new[] {"longtext-longtext-longtext-longtext"}) /> *@
-
 
 @code
 {
+    List<string> financialAccountsNames = new List<string>();
+    
     protected override async Task OnInitializedAsync()
     {
         await AccountService.GetAccounts();
+        AccountService.Accounts.ForEach(acc =>
+        {
+            financialAccountsNames.Add(acc.Name);
+        });
         AccountService.OnChange += StateHasChanged;
     }
 

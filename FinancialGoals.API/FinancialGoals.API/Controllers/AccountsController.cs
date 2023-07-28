@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using FinancialGoals.Core.DTOs.Account;
+using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Repository.AccountService;
 using Microsoft.AspNetCore.Authorization;
 
@@ -54,52 +55,21 @@ namespace FinancialGoals.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(LoginModel model)
+        public async Task<IActionResult> Post(AccountToCreate request)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Email == model.Email);
-            if (user == null)
-            {
-                return Unauthorized();
-            }
+            var userId = 5;
+            // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // var accountsFromRepo = await _accountService.GetUserAccountsAsync(int.Parse(userId));
+            // request.UserId = int.Parse(userId);
+            request.UserId = userId;
+            
+            // Categories = new List<Category>(), // todo: add to profile default categories
+            
+            var account = _mapper.Map<FinancialAccount>(request);
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.SecondName}"),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
-
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("TokenKey").Value));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: "your-issuer",
-                audience: "your-audience",
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: credentials
-            );
-
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return Ok(tokenString);
-
-            //var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            //if (result.Succeeded)
-            //{
-            //    var cookieValue = result.Principal?.Identities?.FirstOrDefault()?.AuthenticationType;
-            //    //return Ok(cookieValue);
-            //    var r = Request.Cookies[cookieValue];
-            //    return Ok(r);
-            //}
-
-            //return BadRequest();
+            await _accountService.AddAccountAsync(account, userId);
+            // await _accountService.AddAccountAsync(account, int.Parse(userId));
+            return Ok();
         }
 
         // PUT api/<AccountController>/5
