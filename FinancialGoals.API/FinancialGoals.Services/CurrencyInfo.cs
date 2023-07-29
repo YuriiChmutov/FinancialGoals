@@ -5,6 +5,11 @@ public class CurrencyInfo
     public int CurrencyId { get; set; }
     public string Currency { get; set; }
     public string CurrencySymbol { get; set; }
+
+    public CurrencyInfo()
+    {
+        
+    }
     
     public CurrencyInfo(CurrencyType currencyType)
     {

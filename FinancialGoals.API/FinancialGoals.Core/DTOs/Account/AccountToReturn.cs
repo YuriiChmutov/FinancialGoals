@@ -9,5 +9,5 @@ public class AccountToReturn
     public string Name { get; set; }
     public double Balance { get; set; }
     public CurrencyInfo CurrencyInfo { get; set; }
-    public List<Models.Category> Categories { get; set; } //todo: change to dto categoryToReturn
+    public List<CategoryToReturn> Categories { get; set; }
 }

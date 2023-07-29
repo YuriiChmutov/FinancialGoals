@@ -74,4 +74,9 @@ public class CategoryService : ICategoryService
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<Category>> GetDefaultCategories()
+    {
+        return await _context.Categories.Where(c => c.Default).ToListAsync();
+    }
 }

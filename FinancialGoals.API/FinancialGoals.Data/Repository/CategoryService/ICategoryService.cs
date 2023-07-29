@@ -13,4 +13,5 @@ public interface ICategoryService
     Task UpdateCategoryAsync(int id, Category category);
     // Task UpdateCategoryByUserIdAsync(int categoryId, Category category, int userId);
     Task DeleteCategoryAsync(int id);
+    Task<List<Category>> GetDefaultCategories();
 }

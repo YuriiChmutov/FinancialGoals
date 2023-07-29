@@ -32,6 +32,7 @@ public class AccountService : IAccountService
     public async Task<FinancialAccount?> GetAccountAsync(int accountId)
     {
         return await _context.FinancialAccounts
+            .Include(acc => acc.Categories)
             .FirstOrDefaultAsync(acc => acc.FinancialAccountId == accountId);
     }
 

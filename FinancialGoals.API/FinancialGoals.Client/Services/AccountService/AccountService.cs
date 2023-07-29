@@ -13,6 +13,7 @@ public class AccountService : IAccountService
     }
 
     public event Action OnChange;
+    public int CurrentAccountId { get; set; }
     public List<AccountToReturn> Accounts { get; set; }
     
     public async Task GetAccounts()

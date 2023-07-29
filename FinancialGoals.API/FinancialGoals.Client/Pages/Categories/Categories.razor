@@ -14,16 +14,14 @@
     <Alert Type="@AlertType.Success" Message="@alertMessage" Closable Style="font-family: EightBitsFont"/>
 }
 <PageTitle>Categories</PageTitle>
-<GridRow>
-    <GridCol Span="3">
+<GridRow Style="font-family: EightBitsFont">
+    <GridCol Span="12">
         <h3>Categories</h3>
+        @* <Button Shape="@ButtonShape.Circle" Icon="plus" @onclick="@(OpenCreateForm)" Type="primary"/> *@
+        <Button @onclick="@(OpenCreateForm)">Add</Button>
+        
         @* <img src="@imageSource" alt="Image" /> *@
         @* <img src="@imageSource" alt="Image" /> *@
-    </GridCol>
-    <GridCol>
-        <div>
-            <Button Shape="@ButtonShape.Circle" Icon="plus" @onclick="@(OpenCreateForm)" Type="primary"/>
-        </div>
     </GridCol>
 </GridRow>
 
@@ -38,24 +36,31 @@ else
     <div>
         <GridRow>
             @foreach (var category in CategoryService.Categories)
-                {
-                    <GridCol Span="6">
-                        <Card
-                            Style="width: 300px;" Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
-                            Title=@(category.Name)
-                            Actions="@(new[] {
-                                         actionEdit(() => OpenEditForm(category.CategoryId)), 
-                                         actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })">
-                            <Divider Orientation="center">
-                                @* <img src="@convert(category.Image.ImageBytes)"/> *@
-                                @category.Amount / @category.Limit
-                            </Divider>
-                        </Card>
-                    </GridCol>
-                }
+            {
+                <GridCol Span="6">
+                    <Card
+                        Style="width: 300px;" Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
+                        Title=@(category.Name)
+                        Actions="@(new[] {
+                                     actionEdit(() => OpenEditForm(category.CategoryId)), 
+                                     actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })">
+                        <Divider Orientation="center">
+                            @* <img src="@convert(category.Image.ImageBytes)"/> *@
+                            @category.Amount / @category.Limit
+                        </Divider>
+                    </Card>
+                </GridCol>
+            }
         </GridRow>
     </div>
 }
+
+<style>
+    /* Custom CSS to style the icon */
+    .custom-icon-style {
+        font-size: 74px;
+    }
+</style>
 
 @* <style> *@
 @*     .custom-modal-overlay{ *@

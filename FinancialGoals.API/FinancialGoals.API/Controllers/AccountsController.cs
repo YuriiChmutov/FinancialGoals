@@ -49,21 +49,20 @@ namespace FinancialGoals.API.Controllers
 
         // GET api/<AccountController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<AccountToReturn>> Get(int id)
         {
-            return "value";
+            var accountFromRepo = await _accountService.GetAccountAsync(id);
+            return _mapper.Map<AccountToReturn>(accountFromRepo);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(AccountToCreate request)
+        public async Task<ActionResult> Post(AccountToCreate request)
         {
             var userId = 5;
             // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             // var accountsFromRepo = await _accountService.GetUserAccountsAsync(int.Parse(userId));
             // request.UserId = int.Parse(userId);
             request.UserId = userId;
-            
-            // Categories = new List<Category>(), // todo: add to profile default categories
             
             var account = _mapper.Map<FinancialAccount>(request);
 

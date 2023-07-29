@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using FinancialGoals.Client.Services.AccountService
+@using FinancialGoals.Core.DTOs.Account
 
 @inject IAccountService AccountService
 @implements IDisposable
@@ -14,12 +15,29 @@
 }
 else
 {
-    <Segmented Block Labels=@financialAccountsNames />
+    <Segmented TValue="int" Block @bind-Value="@AccountService.CurrentAccountId" 
+               OnChange="OnValueChanged" 
+               DefaultValue="@AccountService.CurrentAccountId">
+        @foreach (var account in AccountService.Accounts)
+        {
+            <SegmentedItem Label=@(account.Name) Value=@(account.FinancialAccountId) @key=@account.FinancialAccountId/>
+        }
+    </Segmented>
+    
+    @* <Segmented TValue="int" Block @bind-Value="@selectedValue" OnChange="OnValueChanged"> *@
+    @*     @foreach (var account in financialAccountsIds) *@
+    @*     { *@
+    @*         <SegmentedItem Label=@(account.ToString()) Value=@(account) @key=@account/> *@
+    @*     } *@
+    @* </Segmented> *@
 }
 
 @code
 {
     List<string> financialAccountsNames = new List<string>();
+    List<int> financialAccountsIds = new List<int>();
+    List<AccountToReturn> accounts = new List<AccountToReturn>();
+    private int selectedValue = 0;
     
     protected override async Task OnInitializedAsync()
     {
@@ -27,13 +45,24 @@ else
         AccountService.Accounts.ForEach(acc =>
         {
             financialAccountsNames.Add(acc.Name);
+            financialAccountsIds.Add(acc.FinancialAccountId);
+            accounts.Add(acc);
         });
+        Console.WriteLine($"onInitialized: {financialAccountsNames.Count}");
+        Console.WriteLine($"onInitialized CurrentAccountId: {AccountService.CurrentAccountId}");
         AccountService.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
+        Console.WriteLine("dispose");
         AccountService.OnChange -= StateHasChanged;
+    }
+
+    private void OnValueChanged(int value)
+    {
+        AccountService.CurrentAccountId = value;
+        Console.WriteLine("Selected Value: " + value);
     }
 }
 

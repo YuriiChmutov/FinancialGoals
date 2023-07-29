@@ -8,6 +8,7 @@
         public string? ImageName { get; set; }
         public List<Transaction>? Transactions { get; set; }
         public List<FinancialAccount> FinancialAccounts { get; set; }
+        public bool Default { get; set; } = false;
 
         public Category()
         {
