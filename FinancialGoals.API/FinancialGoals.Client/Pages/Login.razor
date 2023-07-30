@@ -56,8 +56,6 @@
             await LocalStorage.SetItemAsync("authToken", response.Data);
             await AuthenticationStateProvider.GetAuthenticationStateAsync();
             await BlazoredModal.CloseAsync();
-            // AccountService.OnChange += StateHasChanged;
-            // await AccountService.GetAccounts();
             NavigationManager.NavigateTo("");
         }
         else

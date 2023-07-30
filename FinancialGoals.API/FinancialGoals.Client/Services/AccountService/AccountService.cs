@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using FinancialGoals.Core.DTOs.Account;
+using FinancialGoals.Core.DTOs.Category;
 
 namespace FinancialGoals.Client.Services.AccountService;
 
@@ -23,6 +24,6 @@ public class AccountService : IAccountService
     
     public async Task Clean()
     {
-        Accounts.Clear();
+        Accounts = null;
     }
 }

@@ -68,40 +68,7 @@ else
             </GridCol>
         </GridRow>
     }
-    @* <div> *@
-    @*     <GridRow> *@
-    @*         @foreach (var category in CategoryService.Categories) *@
-    @*         { *@
-    @*             <GridCol Span="6"> *@
-    @*                 <Card *@
-    @*                     Style="width: 300px;" Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)" *@
-    @*                     Title=@(category.Name) *@
-    @*                     Actions="@(new[] { *@
-    @*                                  actionEdit(() => OpenEditForm(category.CategoryId)),  *@
-    @*                                  actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })"> *@
-    @*                     <Divider Orientation="center"> *@
-    @*                         $1$ <img src="@convert(category.Image.ImageBytes)"/> #1# *@
-    @*                         @category.Amount / @category.Limit *@
-    @*                     </Divider> *@
-    @*                 </Card> *@
-    @*             </GridCol> *@
-    @*         } *@
-    @*     </GridRow> *@
-    @* </div> *@
 }
-
-<style>
-    /* Custom CSS to style the icon */
-    .custom-icon-style {
-        font-size: 74px;
-    }
-</style>
-
-@* <style> *@
-@*     .custom-modal-overlay{ *@
-@*         color: #0b5ed7; *@
-@*     } *@
-@* </style> *@
 
 @code {
     private Stream imageStream;
