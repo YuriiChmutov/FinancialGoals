@@ -6,6 +6,7 @@ namespace FinancialGoals.Core.Models
     {
         public int FinancialAccountId { get; set; }
         public string Name { get; set; }
+        public int? Number { get; set; }
         public double Balance { get; set; }
         public CurrencyType Currency { get; set; }
         public User User { get; set; }

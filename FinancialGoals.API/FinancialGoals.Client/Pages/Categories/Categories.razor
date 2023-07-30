@@ -3,8 +3,10 @@
 @inject IModalService modal
 @inject ICategoryService CategoryService
 @inject ImageService ImageService
+@inject IAccountService AccountService
 @using Microsoft.VisualBasic
 @using FinancialGoals.Client.Services
+@using FinancialGoals.Client.Services.AccountService
 @using ImageService = FinancialGoals.Client.Services.ImageService
 @using ModalOptions = Blazored.Modal.ModalOptions
 @implements IDisposable
@@ -17,13 +19,12 @@
 <GridRow Style="font-family: EightBitsFont">
     <GridCol Span="12">
         <h3>Categories</h3>
-        @* <Button Shape="@ButtonShape.Circle" Icon="plus" @onclick="@(OpenCreateForm)" Type="primary"/> *@
-        <Button @onclick="@(OpenCreateForm)">Add</Button>
+        <Button @onclick="@(() => OpenCreateForm(2))">Add</Button>
         
-        @* <img src="@imageSource" alt="Image" /> *@
-        @* <img src="@imageSource" alt="Image" /> *@
     </GridCol>
 </GridRow>
+
+
 
 @if (CategoryService.Categories == null)
 {
@@ -33,26 +34,60 @@
 }
 else
 {
-    <div>
+    @foreach (var account in AccountService.Accounts)
+    {
+        <Divider Orientation="left">
+            <GridRow>
+                    @account.Name (@account.FinancialAccountId)
+                    
+            </GridRow>
+        </Divider>
+        
         <GridRow>
             @foreach (var category in CategoryService.Categories)
             {
-                <GridCol Span="6">
-                    <Card
-                        Style="width: 300px;" Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
-                        Title=@(category.Name)
-                        Actions="@(new[] {
-                                     actionEdit(() => OpenEditForm(category.CategoryId)), 
-                                     actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })">
-                        <Divider Orientation="center">
-                            @* <img src="@convert(category.Image.ImageBytes)"/> *@
-                            @category.Amount / @category.Limit
-                        </Divider>
-                    </Card>
-                </GridCol>
+                if (category.FinancialAccountIds.Contains(account.FinancialAccountId))
+                {
+                    <GridCol Span="6">
+                        <Card Class="mb-3"
+                            Style="width: 300px;" Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
+                            Title=@(category.Name)
+                            Actions="@(new[] {
+                                         actionEdit(() => OpenEditForm(category.CategoryId)), 
+                                         actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })">
+                            <Divider Orientation="center">
+                                @* <img src="@convert(category.Image.ImageBytes)"/> *@
+                                @category.Amount / @category.Limit
+                            </Divider>
+                        </Card>
+                    </GridCol>
+                }
             }
+            <GridCol Span="6">
+                <Button @onclick="@(() => OpenCreateForm(account.FinancialAccountId))">Add</Button>
+            </GridCol>
         </GridRow>
-    </div>
+    }
+    @* <div> *@
+    @*     <GridRow> *@
+    @*         @foreach (var category in CategoryService.Categories) *@
+    @*         { *@
+    @*             <GridCol Span="6"> *@
+    @*                 <Card *@
+    @*                     Style="width: 300px;" Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)" *@
+    @*                     Title=@(category.Name) *@
+    @*                     Actions="@(new[] { *@
+    @*                                  actionEdit(() => OpenEditForm(category.CategoryId)),  *@
+    @*                                  actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })"> *@
+    @*                     <Divider Orientation="center"> *@
+    @*                         $1$ <img src="@convert(category.Image.ImageBytes)"/> #1# *@
+    @*                         @category.Amount / @category.Limit *@
+    @*                     </Divider> *@
+    @*                 </Card> *@
+    @*             </GridCol> *@
+    @*         } *@
+    @*     </GridRow> *@
+    @* </div> *@
 }
 
 <style>
@@ -75,6 +110,7 @@ else
     
     protected override async Task OnInitializedAsync()
     {
+        await AccountService.GetAccounts();
         await CategoryService.GetCategories();
         CategoryService.OnChange += StateHasChanged;
     }
@@ -96,16 +132,17 @@ else
     RenderFragment actionEdit(Action clickAction) =>@<Icon Type="edit" OnClick="@clickAction" />;
     RenderFragment actionDelete(Action clickAction) =>@<Icon Type="delete" OnClick="@clickAction" />;
 
-    private async Task OpenCreateForm()
+    private async Task OpenCreateForm(int accountId)
     {
         var options = new ModalOptions() 
         { 
             OverlayCustomClass = "custom-modal-overlay"
         };
         
-        var parameters = new ModalParameters().Add("message", alertMessage);
+        var parameters = new ModalParameters()
+            .Add("AccountId", accountId);
         
-        var message = modal.Show<CategoriesAdd>("Create category");
+        var message = modal.Show<CategoriesAdd>("Create category", parameters);
         var result = await message.Result;
 
         if (result.Confirmed)
@@ -123,7 +160,8 @@ else
 
     private void OpenDeleteForm(int ItemId, string ItemName)
     {
-        var parameters = new ModalParameters().Add(nameof(CategoriesEdit.ItemId), ItemId);
+        var parameters = new ModalParameters()
+            .Add(nameof(CategoriesEdit.ItemId), ItemId);
         modal.Show<CategoryDelete>($"Are you sure that you want to delete '{ItemName}' category?", parameters);
     }
 }

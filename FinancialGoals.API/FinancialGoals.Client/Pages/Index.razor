@@ -6,31 +6,39 @@
 @implements IDisposable
 <PageTitle>Home</PageTitle>
 
-
-@if (AccountService.Accounts == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <Segmented TValue="int" Block @bind-Value="@AccountService.CurrentAccountId" 
-               OnChange="OnValueChanged" 
-               DefaultValue="@AccountService.CurrentAccountId">
-        @foreach (var account in AccountService.Accounts)
+<AuthorizeView>
+    <Authorized>
+        @if (AccountService.Accounts == null)
         {
-            <SegmentedItem Label=@(account.Name) Value=@(account.FinancialAccountId) @key=@account.FinancialAccountId/>
+            <p>
+                <em>Loading...</em>
+            </p>
         }
-    </Segmented>
-    
-    @* <Segmented TValue="int" Block @bind-Value="@selectedValue" OnChange="OnValueChanged"> *@
-    @*     @foreach (var account in financialAccountsIds) *@
-    @*     { *@
-    @*         <SegmentedItem Label=@(account.ToString()) Value=@(account) @key=@account/> *@
-    @*     } *@
-    @* </Segmented> *@
-}
+        else
+        {
+            <Segmented TValue="int" Block @bind-Value="@AccountService.CurrentAccountId" 
+                       OnChange="OnValueChanged" 
+                       DefaultValue="@AccountService.CurrentAccountId">
+                @foreach (var account in AccountService.Accounts)
+                {
+                    <SegmentedItem Label=@(account.Name) Value=@(account.FinancialAccountId) @key=@account.FinancialAccountId/>
+                }
+            </Segmented>
+            
+            @* <Segmented TValue="int" Block @bind-Value="@selectedValue" OnChange="OnValueChanged"> *@
+            @*     @foreach (var account in financialAccountsIds) *@
+            @*     { *@
+            @*         <SegmentedItem Label=@(account.ToString()) Value=@(account) @key=@account/> *@
+            @*     } *@
+            @* </Segmented> *@
+        }
+    </Authorized>
+    <NotAuthorized>
+        <h3>Hello</h3>
+    </NotAuthorized>
+</AuthorizeView>
+
+
 
 @code
 {

@@ -1,9 +1,11 @@
 ﻿@using FinancialGoals.Client.Pages
+@using FinancialGoals.Client.Services.AccountService
 @inject IModalService modal
 @inject ILocalStorageService LocalStorage
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject ICategoryService CategoryService
+@inject IAccountService AccountService
 
 <div class="dropdown" style="font-family: EightBitsFont">
     <button @onclick="ToggleUserMenu"
@@ -58,6 +60,7 @@
         await LocalStorage.RemoveItemAsync("authToken");
         await AuthenticationStateProvider.GetAuthenticationStateAsync();
         await CategoryService.Clean();
+        await AccountService.Clean();
         NavigationManager.NavigateTo("");
     }
     

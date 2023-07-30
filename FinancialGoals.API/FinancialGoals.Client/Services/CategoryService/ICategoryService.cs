@@ -9,7 +9,7 @@ public interface ICategoryService
     List<CategoryToReturn> Categories { get; set; }
     Task GetCategories();
     Task<CategoryToReturn> GetCategory(int categoryId);
-    Task<bool> AddCategory(CategoryToCreate category);
+    Task<bool> AddCategory(CategoryToCreate category, int accountId);
     CategoryToCreate CreateNewCategory();
     Task<bool> UpdateCategory(CategoryToUpdate category);
     Task DeleteCategory(int id);

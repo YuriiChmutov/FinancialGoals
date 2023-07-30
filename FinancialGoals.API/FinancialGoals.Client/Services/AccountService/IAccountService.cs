@@ -8,6 +8,7 @@ public interface IAccountService
     int CurrentAccountId { get; set; }
     List<AccountToReturn> Accounts { get; set; }
     Task GetAccounts();
+    Task Clean();
     // Task<AccountToReturn> GetAccount();
     // Task<bool> AddAccount();
 }

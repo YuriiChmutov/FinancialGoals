@@ -13,6 +13,7 @@ public class CategoryProfile : Profile
         CreateMap<Category, Core.DTOs.Category.CategoryToReturn>()
             .ForMember(dest => dest.Amount, opt => opt.MapFrom<CategoryAmountResolver>())
             .ForMember(dest => dest.Image, opt => opt.MapFrom<CategoryImageResolver>())
+            .ForMember(dest => dest.FinancialAccountIds, opt => opt.MapFrom(x => x.FinancialAccounts.Select(x => x.FinancialAccountId)))
             .ReverseMap();
 
         CreateMap<CategoryToCreate, Category>()

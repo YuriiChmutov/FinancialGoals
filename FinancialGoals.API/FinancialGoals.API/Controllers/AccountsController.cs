@@ -17,6 +17,7 @@ namespace FinancialGoals.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountsController : ControllerBase
     {
         private readonly FinancialDbContext _context;
@@ -39,9 +40,9 @@ namespace FinancialGoals.API.Controllers
         // [Authorize]
         public async Task<ActionResult<IEnumerable<AccountToReturn>>> Get()
         {
-            // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            // var accountsFromRepo = await _accountService.GetUserAccountsAsync(int.Parse(userId));
-            var accountsFromRepo = await _accountService.GetUserAccountsAsync(5);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var accountsFromRepo = await _accountService.GetUserAccountsAsync(int.Parse(userId));
+            // var accountsFromRepo = await _accountService.GetUserAccountsAsync(5);
 
             var accountsToReturn = _mapper.Map<List<AccountToReturn>>(accountsFromRepo);
             return Ok(accountsToReturn);
@@ -58,16 +59,16 @@ namespace FinancialGoals.API.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(AccountToCreate request)
         {
-            var userId = 5;
-            // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            // var accountsFromRepo = await _accountService.GetUserAccountsAsync(int.Parse(userId));
-            // request.UserId = int.Parse(userId);
-            request.UserId = userId;
+            // var userId = 5;
+            // request.UserId = userId;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var accountsFromRepo = await _accountService.GetUserAccountsAsync(int.Parse(userId));
+            request.UserId = int.Parse(userId);
             
             var account = _mapper.Map<FinancialAccount>(request);
 
-            await _accountService.AddAccountAsync(account, userId);
-            // await _accountService.AddAccountAsync(account, int.Parse(userId));
+            // await _accountService.AddAccountAsync(account, userId);
+            await _accountService.AddAccountAsync(account, int.Parse(userId));
             return Ok();
         }
 

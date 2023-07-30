@@ -21,7 +21,7 @@ public class AccountCreateResolver : ITypeConverter<AccountToCreate, FinancialAc
 
     public FinancialAccount Convert(AccountToCreate source, FinancialAccount destination, ResolutionContext context)
     {
-        var nextNumberForAccountName = _accountService.GetAmountOfUsersCurrencyAccounts((int) source.UserId, source.CurrencyType).Result;
+        var nextNumberForAccountName = _accountService.GetAmountOfUsersCurrencyAccounts((int) source.UserId, source.CurrencyType).Result + 1;
         var defaultCategories = _categoryService.GetDefaultCategories().Result;
         
         return new FinancialAccount
@@ -29,8 +29,8 @@ public class AccountCreateResolver : ITypeConverter<AccountToCreate, FinancialAc
             Balance = 0,
             Currency = source.CurrencyType,
             Name = $"AccUser{source.UserId}_{((CurrencyType) source.CurrencyType).ToString()}_{nextNumberForAccountName}", //todo: make a limit-control for amount of accounts
-            UserId = (int) source.UserId,
-            Categories = defaultCategories
+            Number = nextNumberForAccountName,
+            UserId = (int) source.UserId
         };
     }
 }

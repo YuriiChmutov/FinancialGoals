@@ -20,4 +20,9 @@ public class AccountService : IAccountService
     {
         Accounts = await _http.GetFromJsonAsync<List<AccountToReturn>>("https://localhost:7128/api/Accounts");
     }
+    
+    public async Task Clean()
+    {
+        Accounts.Clear();
+    }
 }

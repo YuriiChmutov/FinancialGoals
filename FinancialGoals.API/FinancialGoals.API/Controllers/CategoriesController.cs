@@ -44,7 +44,19 @@ namespace FinancialGoals.API.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var categoriesFromRepo = 
-                await _categoryService.GetCategoriesByUserIdAsync(int.Parse(userId), 2);
+                await _categoryService.GetCategoriesByUserIdAsync(int.Parse(userId)); 
+
+            var categoriesToReturn = _mapper.Map<List<CategoryToReturn>>(categoriesFromRepo);
+            
+            return Ok(categoriesToReturn);
+        }
+        
+        [HttpGet("categories-for-account/{accountId}")]
+        public async Task<ActionResult<IEnumerable<CategoryToReturn>>> GetCategoriesByAccountId(int accountId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var categoriesFromRepo = 
+                await _categoryService.GetCategoriesForAccountAsync(accountId);
 
             var categoriesToReturn = _mapper.Map<List<CategoryToReturn>>(categoriesFromRepo);
             
@@ -53,11 +65,9 @@ namespace FinancialGoals.API.Controllers
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
-        // [Authorize]
         public async Task<ActionResult<CategoryToReturn>> GetCategory(int id)
         {
             var user = User; // to get user claims (its not my user, its ClaimsPrincipal), just to see at debug mode
-
             var categoryFromRepo = await _categoryService.GetCategoryAsync(id);
         
             if (categoryFromRepo == null)
@@ -111,13 +121,13 @@ namespace FinancialGoals.API.Controllers
         }
         
         // POST: api/Categories
-        [HttpPost]
+        [HttpPost("{accountId}")]
         [Authorize]
-        public async Task<ActionResult<Category>> PostCategory(CategoryToCreate newCategory)
+        public async Task<ActionResult<Category>> PostCategory(CategoryToCreate request, int accountId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var category = _mapper.Map<Core.Models.Category>(newCategory);
-            await _categoryService.AddCategoryByUserIdAsync(category, Int32.Parse(userId));
+            var category = _mapper.Map<Core.Models.Category>(request);
+            await _categoryService.AddCategoryForAccountAsync(category, Int32.Parse(userId), accountId);
 
             var categoryToReturn = _mapper.Map<Category>(category);
             

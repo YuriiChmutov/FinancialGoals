@@ -27,9 +27,9 @@ public class CategoryService : ICategoryService
         throw new NotImplementedException();
     }
 
-    public async Task<bool> AddCategory(CategoryToCreate newCategory)
+    public async Task<bool> AddCategory(CategoryToCreate newCategory, int accountId)
     {
-        var response = await _http.PostAsJsonAsync("https://localhost:7128/api/Categories", newCategory);
+        var response = await _http.PostAsJsonAsync($"https://localhost:7128/api/Categories/{accountId}", newCategory);
         await GetCategories();
         OnChange.Invoke();
 
