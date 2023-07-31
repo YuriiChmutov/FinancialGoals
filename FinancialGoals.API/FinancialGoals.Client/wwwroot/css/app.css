@@ -114,8 +114,8 @@ a, .btn-link {
     font-family: "EightBitsFont";
     /*color: gold;*/
 }
-    
-/*.bm-title {*/
-/*    font-family: EightBitsFont;*/
-/*    background-color: #1b6ec2;*/
-/*}*/    
+
+.ant-card-actions {
+    background-color: #00FFFF;
+}
+  

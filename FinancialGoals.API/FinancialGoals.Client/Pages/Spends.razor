@@ -3,33 +3,84 @@
 @using FinancialGoals.Core.DTOs.Account
 
 @inject IAccountService AccountService
+@inject ICategoryService CategoryService
 @implements IDisposable
 <PageTitle>Spends</PageTitle>
 
-<AuthorizeView>
-    <Authorized>
-        @if (AccountService.Accounts == null)
+
+@if (AccountService.Accounts == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <Segmented TValue="int" Block @bind-Value="@AccountService.CurrentAccountId" 
+               OnChange="OnValueChanged" 
+               DefaultValue="@AccountService.CurrentAccountId">
+        @foreach (var account in AccountService.Accounts)
         {
-            <p>
-                <em>Loading...</em>
-            </p>
+            <SegmentedItem Label=@(account.Name) Value=@(account.FinancialAccountId) @key=@account.FinancialAccountId/>
         }
-        else
-        {
-            <Segmented TValue="int" Block @bind-Value="@AccountService.CurrentAccountId" 
-                       OnChange="OnValueChanged" 
-                       DefaultValue="@AccountService.CurrentAccountId">
-                @foreach (var account in AccountService.Accounts)
-                {
-                    <SegmentedItem Label=@(account.Name) Value=@(account.FinancialAccountId) @key=@account.FinancialAccountId/>
-                }
-            </Segmented>
-        }
-    </Authorized>
-    <NotAuthorized>
-        <h3>Hello</h3>
-    </NotAuthorized>
-</AuthorizeView>
+    </Segmented>
+    
+    <div>
+        <GridRow Style="height: 1000px; font-family: EightBitsFont">
+            <GridCol Span="12" Style="background-color: #0dcaf0">
+                <GridRow Style="height: 150px">
+                    <GridCol Style="background-color: #0d6efd; margin: 20px; border-radius: 20px; width: 100%">
+                        Input
+                    </GridCol>
+                </GridRow>
+                <GridRow Style="height: 800px">
+                    <GridCol Span="24" Style="background-color: #3a0647">
+                        <GridRow Gutter="(16,24)">
+                                <GridCol Class="gutter-row" Span="6">
+                                    <div style="@style">col-6</div>
+                                </GridCol>
+                                <GridCol Class="gutter-row" Span="6">
+                                    <div style="@style">col-6</div>
+                                </GridCol>
+                                <GridCol Class="gutter-row" Span="6">
+                                    <div style="@style">col-6</div>
+                                </GridCol>
+                                <GridCol Class="gutter-row" Span="6">
+                                    <div style="@style">col-6</div>
+                                </GridCol>
+                                <GridCol Class="gutter-row" Span="6">
+                                    <div style="@style">col-6</div>
+                                </GridCol>
+                                <GridCol Class="gutter-row" Span="6">
+                                    <div style="@style">col-6</div>
+                                </GridCol>
+                                <GridCol Class="gutter-row" Span="6">
+                                    <div style="@style">col-6</div>
+                                </GridCol>
+                                <GridCol Class="gutter-row" Span="6">
+                                    <div style="@style">col-6</div>
+                                </GridCol>
+                            </GridRow>
+                    </GridCol>
+                </GridRow>
+            </GridCol>
+            <GridCol Span="12" Style="background-color: #20c997">
+                <GridRow>
+                    @foreach (var category in CategoryService.Categories.Where(x => x.FinancialAccountIds.Contains(AccountService.CurrentAccountId)))
+                    {
+                        <GridCol Span="4" Style="margin-top: 20px; margin-left: 20px">
+                            <div onclick="@(() => handleCategoryId(category.CategoryId))">
+                                <Card Hoverable Style="@(category.CategoryId == selectedCategoryId ? styleForCard : "width: 130px")" Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)">
+                                    <CardMeta Style="justify-content: center" Title="@category.Name" />
+                                </Card>
+                            </div>
+                        </GridCol>
+                    }
+                </GridRow>
+            </GridCol>
+        </GridRow>
+    </div>
+}
 
 @code
 {
@@ -37,10 +88,16 @@
     List<int> financialAccountsIds = new List<int>();
     List<AccountToReturn> accounts = new List<AccountToReturn>();
     private int selectedValue = 0;
+
+    int selectedCategoryId;
+    string styleForCard = "width: 130px; border: 2px solid #001529; background-color: #FFFF00; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);";
+    string style="background: #0092ff; padding: 8px 0;";
     
     protected override async Task OnInitializedAsync()
     {
         await AccountService.GetAccounts();
+        await CategoryService.GetCategories();
+        selectedCategoryId = CategoryService.Categories[0].CategoryId;
         AccountService.Accounts.ForEach(acc =>
         {
             financialAccountsNames.Add(acc.Name);
@@ -62,6 +119,22 @@
     {
         AccountService.CurrentAccountId = value;
         Console.WriteLine("Selected Value: " + value);
+    }
+    
+    private string getImageDataFromBytes(byte[] imageData)
+    {
+        string base64Image = Convert.ToBase64String(imageData);
+        return $"data:image/png;base64,{base64Image}";
+    }
+    
+    RenderFragment coverTemplate (byte[] imageData, string imageName) => 
+        @<img Style="width: 75px; margin: auto" alt="@imageName" src="@getImageDataFromBytes(imageData)" />;
+
+    private void handleCategoryId(int value)
+    {
+        this.selectedCategoryId = value;
+        Console.WriteLine($"selectedCategoryId: {selectedCategoryId}");
+        StateHasChanged();
     }
 }
 
