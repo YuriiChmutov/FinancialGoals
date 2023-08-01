@@ -5,6 +5,7 @@ namespace FinancialGoals.Data.Repository.TransactionService;
 public interface ITransactionService
 {
     Task<List<Transaction>> GetTransactionsByAccountIdAsync(int accountId);
+    Task<List<Transaction>> GetTransactionsForUserAsync(int userId);
     Task<List<Transaction>> GetTransactionsByDateAsync(int accountId, DateTime dateStart, DateTime? dateEnd = null);
     Task<bool> TransactionExistsAsync(int id);
     Task<Transaction?> GetTransactionAsync(int id);

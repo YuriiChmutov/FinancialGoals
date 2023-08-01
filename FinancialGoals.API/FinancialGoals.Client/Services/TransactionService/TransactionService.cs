@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using FinancialGoals.Core.DTOs.Transaction;
 
 namespace FinancialGoals.Client.Services.TransactionService;
@@ -23,5 +24,12 @@ public class TransactionService : ITransactionService
     public Task<TransactionToReturn> GetTransaction(int transactionId)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<bool> AddTransaction(TransactionToCreate transaction)
+    {
+        var response = await _http.PostAsJsonAsync($"https://localhost:7128/api/Transactions", transaction);
+        OnChange.Invoke();
+        return response.StatusCode == HttpStatusCode.Created ? true : false;
     }
 }

@@ -4,6 +4,6 @@
     color: gold;
 }
 
-/*.bm-title{*/
-/*    font-family: EightBitsFont;*/
-/*}*/
+.ant-card-actions {
+    background-color: #00FFFF;
+}

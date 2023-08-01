@@ -8,7 +8,7 @@ public interface ITransactionService
     List<TransactionToReturn> Transactions { get; set; }
     Task GetTransactions(int currentUserId);
     Task<TransactionToReturn> GetTransaction(int transactionId);
-    // Task<bool> AddTransaction(CategoryToCreate category);
+    Task<bool> AddTransaction(TransactionToCreate transaction);
     // CategoryToCreate CreateNewCategory();
     // Task<bool> UpdateCategory(CategoryToUpdate category);
     // Task DeleteCategory(int id);

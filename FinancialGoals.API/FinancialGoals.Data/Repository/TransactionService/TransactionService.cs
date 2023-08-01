@@ -22,6 +22,14 @@ public class TransactionService : ITransactionService
             .ToListAsync();
     }
 
+    public async Task<List<Transaction>> GetTransactionsForUserAsync(int userId)
+    {
+        return await _context.Transactions
+            .Include(t => t.FinancialAccount)
+            .Where(t => t.FinancialAccount.UserId == userId)
+            .ToListAsync();
+    }
+
     public async Task<List<Transaction>> GetTransactionsByDateAsync(int accountId, DateTime dateStart, DateTime? dateEnd = null)
     {
         dateEnd ??= DateTime.Now;

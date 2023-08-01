@@ -118,4 +118,8 @@ a, .btn-link {
 .ant-card-actions {
     background-color: #00FFFF;
 }
+
+.ant-input-number-input {
+    height: 100px;
+}
   

@@ -1,11 +1,19 @@
 ﻿@page "/spends"
 @using FinancialGoals.Client.Services.AccountService
 @using FinancialGoals.Core.DTOs.Account
+@using FinancialGoals.Core.DTOs.Transaction
+@using FinancialGoals.Services
 
 @inject IAccountService AccountService
 @inject ICategoryService CategoryService
+@inject ITransactionService TransactionService
 @implements IDisposable
 <PageTitle>Spends</PageTitle>
+
+@if (addedSuccessfully)
+{
+    <Alert Type="@AlertType.Success" Message="Transaction added successfully!" Closable Style="font-family: EightBitsFont"/>
+}
 
 
 @if (AccountService.Accounts == null)
@@ -18,7 +26,9 @@ else
 {
     <Segmented TValue="int" Block @bind-Value="@AccountService.CurrentAccountId" 
                OnChange="OnValueChanged" 
-               DefaultValue="@AccountService.CurrentAccountId">
+               DefaultValue="@AccountService.CurrentAccountId"
+               Style="font-family: EightBitsFont"
+               Size="SegmentedSize.Large">
         @foreach (var account in AccountService.Accounts)
         {
             <SegmentedItem Label=@(account.Name) Value=@(account.FinancialAccountId) @key=@account.FinancialAccountId/>
@@ -27,50 +37,37 @@ else
     
     <div>
         <GridRow Style="height: 1000px; font-family: EightBitsFont">
-            <GridCol Span="12" Style="background-color: #0dcaf0">
+            <GridCol Span="12">
                 <GridRow Style="height: 150px">
-                    <GridCol Style="background-color: #0d6efd; margin: 20px; border-radius: 20px; width: 100%">
-                        Input
-                    </GridCol>
+                    <AntDesign.InputNumber Size="@InputSize.Large" @bind-Value="currentInput" 
+                                           Style="width: 80%; 
+                                           height: 50px; 
+                                           border-radius: 5px; 
+                                           font-size: 28px; 
+                                           margin-left: auto; 
+                                           margin-right: auto; 
+                                           margin-top: 45px"/>
                 </GridRow>
-                <GridRow Style="height: 800px">
-                    <GridCol Span="24" Style="background-color: #3a0647">
+                <GridRow Style="height: 800px; width: 80%; margin: auto">
+                    <GridCol Span="24">
                         <GridRow Gutter="(16,24)">
-                                <GridCol Class="gutter-row" Span="6">
-                                    <div style="@style">col-6</div>
+                            @foreach (var button in namesOfButtons)
+                            {
+                                <GridCol Class="gutter-row" Span="8">
+                                    <Button style="@style" OnClick="() => HandleButtonClick(button)">@button</Button>
                                 </GridCol>
-                                <GridCol Class="gutter-row" Span="6">
-                                    <div style="@style">col-6</div>
-                                </GridCol>
-                                <GridCol Class="gutter-row" Span="6">
-                                    <div style="@style">col-6</div>
-                                </GridCol>
-                                <GridCol Class="gutter-row" Span="6">
-                                    <div style="@style">col-6</div>
-                                </GridCol>
-                                <GridCol Class="gutter-row" Span="6">
-                                    <div style="@style">col-6</div>
-                                </GridCol>
-                                <GridCol Class="gutter-row" Span="6">
-                                    <div style="@style">col-6</div>
-                                </GridCol>
-                                <GridCol Class="gutter-row" Span="6">
-                                    <div style="@style">col-6</div>
-                                </GridCol>
-                                <GridCol Class="gutter-row" Span="6">
-                                    <div style="@style">col-6</div>
-                                </GridCol>
-                            </GridRow>
+                            }
+                        </GridRow>
                     </GridCol>
                 </GridRow>
             </GridCol>
-            <GridCol Span="12" Style="background-color: #20c997">
+            <GridCol Span="12">
                 <GridRow>
                     @foreach (var category in CategoryService.Categories.Where(x => x.FinancialAccountIds.Contains(AccountService.CurrentAccountId)))
                     {
-                        <GridCol Span="4" Style="margin-top: 20px; margin-left: 20px">
+                        <GridCol Span="4" Style="margin-top: 45px; margin-left: 20px">
                             <div onclick="@(() => handleCategoryId(category.CategoryId))">
-                                <Card Hoverable Style="@(category.CategoryId == selectedCategoryId ? styleForCard : "width: 130px")" Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)">
+                                <Card Hoverable Style="@(category.CategoryId == selectedCategoryId ? styleForCard : "width: 130px; border-radius: 5px;")" Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)">
                                     <CardMeta Style="justify-content: center" Title="@category.Name" />
                                 </Card>
                             </div>
@@ -87,17 +84,24 @@ else
     List<string> financialAccountsNames = new List<string>();
     List<int> financialAccountsIds = new List<int>();
     List<AccountToReturn> accounts = new List<AccountToReturn>();
-    private int selectedValue = 0;
+    private int selectedValue { get; set; }
+
+    List<string> namesOfButtons = new List<string> {"7", "8", "9", "4", "5", "6", "1", "2", "3", "C", "0", "Add"};
+    private int? currentInput = 0;
+    private bool isNewInput = true;
+    private int result = 0;
+    private bool addedSuccessfully = false;
 
     int selectedCategoryId;
-    string styleForCard = "width: 130px; border: 2px solid #001529; background-color: #FFFF00; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);";
-    string style="background: #0092ff; padding: 8px 0;";
+    string styleForCard = "width: 130px; border: 2px solid #001529; background-color: gold; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); border-radius: 5px;";
+    string style="background: gold; padding: 8px 0; width: 100%; height: auto; font-size: 28px; border-radius: 5px;";
     
     protected override async Task OnInitializedAsync()
     {
         await AccountService.GetAccounts();
         await CategoryService.GetCategories();
         selectedCategoryId = CategoryService.Categories[0].CategoryId;
+        selectedValue = AccountService.Accounts[0].FinancialAccountId;
         AccountService.Accounts.ForEach(acc =>
         {
             financialAccountsNames.Add(acc.Name);
@@ -135,6 +139,40 @@ else
         this.selectedCategoryId = value;
         Console.WriteLine($"selectedCategoryId: {selectedCategoryId}");
         StateHasChanged();
+    }
+    
+    private async Task HandleButtonClick(string button)
+    {
+        if (int.TryParse(button, out _))
+        {
+            if (isNewInput)
+            {
+                currentInput = int.Parse(button);
+                isNewInput = false;
+            }
+            else
+            {
+                currentInput = int.Parse(currentInput.ToString() + button);
+            }
+        }
+        else if (button == "C")
+        {
+            currentInput = 0;
+            isNewInput = true;
+            result = 0;
+        }
+        else
+        {
+            var transaction = new TransactionToCreate
+            {
+                FinancialAccountId = selectedValue,
+                CategoryId = selectedCategoryId,
+                Date = DateTime.Now,
+                Type = TransactionType.Expense,
+                Amount = (int)currentInput
+            };
+            addedSuccessfully = await TransactionService.AddTransaction(transaction);
+        }
     }
 }
 

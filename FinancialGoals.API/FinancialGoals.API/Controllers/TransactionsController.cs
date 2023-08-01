@@ -1,15 +1,18 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using FinancialGoals.Core.DTOs.Transaction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
 using FinancialGoals.Data.Repository.TransactionService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinancialGoals.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TransactionsController : ControllerBase
     {
         private readonly ITransactionService _transactionService;
@@ -25,8 +28,8 @@ namespace FinancialGoals.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TransactionToReturn>>> GetTransactions()
         {
-            var accountId = 1; // todo User.CurrentUser.Id
-            var transactionsFromRepo = await _transactionService.GetTransactionsByAccountIdAsync(accountId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var transactionsFromRepo = await _transactionService.GetTransactionsForUserAsync(int.Parse(userId));
 
             var transactionsToReturn = _mapper.Map<IList<TransactionToReturn>>(transactionsFromRepo);
 
@@ -75,21 +78,17 @@ namespace FinancialGoals.API.Controllers
         //
         //     return NoContent();
         // }
-        //
-        // // POST: api/Transactions
-        // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPost]
-        // public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
-        // {
-        //   if (_context.Transactions == null)
-        //   {
-        //       return Problem("Entity set 'FinancialDbContext.Transactions'  is null.");
-        //   }
-        //     _context.Transactions.Add(transaction);
-        //     await _context.SaveChangesAsync();
-        //
-        //     return CreatedAtAction("GetTransaction", new { id = transaction.TransactionId }, transaction);
-        // }
+        
+        // POST: api/Transactions
+        [HttpPost]
+        public async Task<ActionResult<Transaction>> PostTransaction(TransactionToCreate request)
+        {
+            var transaction = _mapper.Map<Transaction>(request);
+            await _transactionService.AddTransactionAsync(transaction);
+
+            var transactionToReturn = _mapper.Map<Transaction>(transaction);
+            return CreatedAtAction("GetTransaction", new { id = transaction.TransactionId }, transaction);
+        }
         //
         // // DELETE: api/Transactions/5
         // [HttpDelete("{id}")]
