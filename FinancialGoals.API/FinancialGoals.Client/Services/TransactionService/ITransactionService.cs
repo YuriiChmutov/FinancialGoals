@@ -5,8 +5,8 @@ namespace FinancialGoals.Client.Services.TransactionService;
 public interface ITransactionService
 {
     event Action OnChange;
-    List<TransactionToReturn> Transactions { get; set; }
-    Task GetTransactions(int currentUserId);
+    TransactionsDataDTO TransactionsData { get; set; }
+    Task GetTransactions(int page);
     Task<TransactionToReturn> GetTransaction(int transactionId);
     Task<bool> AddTransaction(TransactionToCreate transaction);
     // CategoryToCreate CreateNewCategory();

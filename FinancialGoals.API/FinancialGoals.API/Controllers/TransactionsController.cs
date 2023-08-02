@@ -25,15 +25,13 @@ namespace FinancialGoals.API.Controllers
         }
 
         // GET: api/Transactions
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TransactionToReturn>>> GetTransactions()
+        [HttpGet("user-transactions/{page}")]
+        public async Task<ActionResult<TransactionsDataDTO>> GetTransactions(int page)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var transactionsFromRepo = await _transactionService.GetTransactionsForUserAsync(int.Parse(userId));
-
-            var transactionsToReturn = _mapper.Map<IList<TransactionToReturn>>(transactionsFromRepo);
-
-            return Ok(transactionsToReturn);
+            var transactionsFromRepo = await _transactionService.GetTransactionsForUserAsync(int.Parse(userId), page);
+            
+            return Ok(transactionsFromRepo);
         }
 
         // GET: api/Transactions/5
@@ -87,7 +85,7 @@ namespace FinancialGoals.API.Controllers
             await _transactionService.AddTransactionAsync(transaction);
 
             var transactionToReturn = _mapper.Map<Transaction>(transaction);
-            return CreatedAtAction("GetTransaction", new { id = transaction.TransactionId }, transaction);
+            return Ok(transactionToReturn);
         }
         //
         // // DELETE: api/Transactions/5

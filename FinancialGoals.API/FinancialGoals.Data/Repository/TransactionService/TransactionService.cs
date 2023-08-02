@@ -1,4 +1,6 @@
-﻿using FinancialGoals.Core.Models;
+﻿using AutoMapper;
+using FinancialGoals.Core.DTOs.Transaction;
+using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,11 +9,13 @@ namespace FinancialGoals.Data.Repository.TransactionService;
 public class TransactionService : ITransactionService
 {
     private readonly FinancialDbContext _context;
+    private readonly IMapper _mapper;
 
-    public TransactionService(FinancialDbContext context)
+    public TransactionService(FinancialDbContext context, IMapper mapper)
     {
         _context = context ??
                    throw new ArgumentNullException(nameof(context));
+        _mapper = mapper;
     }
 
     public async Task<List<Transaction>> GetTransactionsByAccountIdAsync(int accountId)
@@ -22,12 +26,25 @@ public class TransactionService : ITransactionService
             .ToListAsync();
     }
 
-    public async Task<List<Transaction>> GetTransactionsForUserAsync(int userId)
+    public async Task<TransactionsDataDTO> GetTransactionsForUserAsync(int userId, int page)
     {
-        return await _context.Transactions
+        var pageResults = 3f;
+        var data = await _context.Transactions
             .Include(t => t.FinancialAccount)
             .Where(t => t.FinancialAccount.UserId == userId)
+            .OrderByDescending(t => t.Date)
             .ToListAsync();
+
+        var pageCount = Math.Ceiling(data.Count / pageResults);
+
+        var transactions = data.Skip((page - 1) * (int) pageCount).Take((int) pageResults).ToList();
+
+        return new TransactionsDataDTO
+        {
+            Transactions = _mapper.Map<List<TransactionToReturn>>(transactions),
+            Pages = (int) pageCount,
+            CurrentPage = page
+        };
     }
 
     public async Task<List<Transaction>> GetTransactionsByDateAsync(int accountId, DateTime dateStart, DateTime? dateEnd = null)

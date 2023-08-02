@@ -9,7 +9,8 @@ public class TransactionProfile : Profile
     public TransactionProfile()
     {
         CreateMap<Transaction, Core.DTOs.Transaction.TransactionToReturn>().ReverseMap();
-        CreateMap<TransactionToCreate, Transaction>()
-            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => DateTime.UtcNow));
+        CreateMap<TransactionToCreate, Transaction>();
+        CreateMap<TransactionToReturn, TransactionsDataDTO>()
+            .ForMember(dest => dest.Transactions, opt => opt.MapFrom(x => x));
     }
 }

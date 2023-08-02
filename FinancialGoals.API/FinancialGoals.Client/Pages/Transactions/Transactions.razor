@@ -5,7 +5,7 @@
 @using FinancialGoals.Services
 @implements IDisposable
 
-<AntList Class="demo-loadmore-list" DataSource="@TransactionService.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
+<AntList Class="demo-loadmore-list" DataSource="@TransactionService.TransactionsData.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
     <ChildContent Context="item">
         <ListItem Actions="actions">
             <ListItemMeta AvatarTemplate="avatar" Description="@item.Description">
@@ -43,11 +43,10 @@
     
     protected override async Task OnInitializedAsync()
     {
-        var currentUserId = 1;
-        await TransactionService.GetTransactions(currentUserId);
+        await TransactionService.GetTransactions(1);
         TransactionService.OnChange += StateHasChanged;
-        InitLoading = false;
         await base.OnInitializedAsync();
+        InitLoading = false;
     }
     
     public async Task OnLoadMore()
@@ -63,5 +62,4 @@
     {
         TransactionService.OnChange -= StateHasChanged;
     }
-    
 }
