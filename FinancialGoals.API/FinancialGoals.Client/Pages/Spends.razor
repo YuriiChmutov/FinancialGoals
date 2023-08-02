@@ -12,7 +12,7 @@
 
 @if (addedSuccessfully)
 {
-    <Alert Type="@AlertType.Success" Message="Transaction added successfully!" Closable Style="font-family: EightBitsFont"/>
+    <Alert Type="@AlertType.Success" Message="Transaction added successfully!" Closable Style="font-family: EightBitsFont; margin-bottom: 20px"/>
 }
 
 
@@ -39,7 +39,7 @@ else
         <GridRow Style="height: 1000px; font-family: EightBitsFont">
             <GridCol Span="12">
                 <GridRow Style="height: 150px">
-                    <AntDesign.InputNumber Size="@InputSize.Large" @bind-Value="currentInput" 
+                    <AntDesign.InputNumber Size="@InputSize.Large" @bind-Value="currentInput" Min=0
                                            Style="width: 80%; 
                                            height: 50px; 
                                            border-radius: 5px; 
@@ -48,7 +48,7 @@ else
                                            margin-right: auto; 
                                            margin-top: 45px"/>
                 </GridRow>
-                <GridRow Style="height: 800px; width: 80%; margin: auto">
+                <GridRow Style=" width: 80%; margin: auto">
                     <GridCol Span="24">
                         <GridRow Gutter="(16,24)">
                             @foreach (var button in namesOfButtons)
@@ -59,6 +59,10 @@ else
                             }
                         </GridRow>
                     </GridCol>
+                </GridRow>
+                <GridRow Style="width:80%; margin-right: auto; margin-left: auto; margin-top: 45px; border-radius: 5px">
+                    <TextArea Placeholder="Notes"  AllowClear="true" @bind-Value="notes" 
+                            Style="font-size: 28px; "/>
                 </GridRow>
             </GridCol>
             <GridCol Span="12">
@@ -81,18 +85,15 @@ else
 
 @code
 {
-    List<string> financialAccountsNames = new List<string>();
-    List<int> financialAccountsIds = new List<int>();
-    List<AccountToReturn> accounts = new List<AccountToReturn>();
-    private int selectedValue { get; set; }
+    private int selectedAccountId;
+    private int selectedCategoryId;
+    private string notes = string.Empty;
 
     List<string> namesOfButtons = new List<string> {"7", "8", "9", "4", "5", "6", "1", "2", "3", "C", "0", "Add"};
     private int? currentInput = 0;
     private bool isNewInput = true;
-    private int result = 0;
     private bool addedSuccessfully = false;
 
-    int selectedCategoryId;
     string styleForCard = "width: 130px; border: 2px solid #001529; background-color: gold; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); border-radius: 5px;";
     string style="background: gold; padding: 8px 0; width: 100%; height: auto; font-size: 28px; border-radius: 5px;";
     
@@ -101,28 +102,18 @@ else
         await AccountService.GetAccounts();
         await CategoryService.GetCategories();
         selectedCategoryId = CategoryService.Categories[0].CategoryId;
-        selectedValue = AccountService.Accounts[0].FinancialAccountId;
-        AccountService.Accounts.ForEach(acc =>
-        {
-            financialAccountsNames.Add(acc.Name);
-            financialAccountsIds.Add(acc.FinancialAccountId);
-            accounts.Add(acc);
-        });
-        Console.WriteLine($"onInitialized: {financialAccountsNames.Count}");
-        Console.WriteLine($"onInitialized CurrentAccountId: {AccountService.CurrentAccountId}");
+        selectedAccountId = AccountService.Accounts[0].FinancialAccountId;
         AccountService.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
-        Console.WriteLine("dispose");
         AccountService.OnChange -= StateHasChanged;
     }
 
     private void OnValueChanged(int value)
     {
         AccountService.CurrentAccountId = value;
-        Console.WriteLine("Selected Value: " + value);
     }
     
     private string getImageDataFromBytes(byte[] imageData)
@@ -132,12 +123,11 @@ else
     }
     
     RenderFragment coverTemplate (byte[] imageData, string imageName) => 
-        @<img Style="width: 75px; margin: auto" alt="@imageName" src="@getImageDataFromBytes(imageData)" />;
+        @<img Style="width: 75px; margin: auto; margin-top: 10%" alt="@imageName" src="@getImageDataFromBytes(imageData)" />;
 
     private void handleCategoryId(int value)
     {
         this.selectedCategoryId = value;
-        Console.WriteLine($"selectedCategoryId: {selectedCategoryId}");
         StateHasChanged();
     }
     
@@ -159,19 +149,22 @@ else
         {
             currentInput = 0;
             isNewInput = true;
-            result = 0;
         }
         else
         {
             var transaction = new TransactionToCreate
             {
-                FinancialAccountId = selectedValue,
+                FinancialAccountId = selectedAccountId,
                 CategoryId = selectedCategoryId,
                 Date = DateTime.Now,
                 Type = TransactionType.Expense,
-                Amount = (int)currentInput
+                Amount = (int)currentInput,
+                Description = notes
             };
             addedSuccessfully = await TransactionService.AddTransaction(transaction);
+            currentInput = 0;
+            notes = string.Empty;
+            TransactionService.OnChange += StateHasChanged;
         }
     }
 }

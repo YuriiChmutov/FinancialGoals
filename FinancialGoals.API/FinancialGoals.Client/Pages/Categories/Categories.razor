@@ -19,16 +19,13 @@
 <GridRow Style="font-family: EightBitsFont">
     <GridCol Span="12">
         <h3>Categories</h3>
-        <Button @onclick="@(() => OpenCreateForm(2))">Add</Button>
-        
     </GridCol>
 </GridRow>
 
 
-
 @if (CategoryService.Categories == null)
 {
-    <p>
+    <p style="font-family: EightBitsFont">
         <em>Loading...</em>
     </p>
 }
@@ -36,7 +33,7 @@ else
 {
     @foreach (var account in AccountService.Accounts)
     {
-        <Divider Orientation="left">
+        <Divider Orientation="left" Style="font-family: EightBitsFont">
             <GridRow>
                     @account.Name (@account.FinancialAccountId)
             </GridRow>
@@ -53,7 +50,7 @@ else
                               width: 300px; 
                               background-color: #00ffff; 
                               font-family: EightBitsFont; 
-                              border-color: #FFD700; border-width: thick; border-radius: 3%" 
+                              border-color: #FFD700; border-width: thick; border-radius: 5px" 
                               Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
                             Title=@(category.Name)
                             Actions="@(new[] {
@@ -68,7 +65,11 @@ else
                 }
             }
             <GridCol Span="6">
-                <Button @onclick="@(() => OpenCreateForm(account.FinancialAccountId))">Add</Button>
+                <Card Style="width: 300px; height: 95%; border-color: #FFD700; border-width: thick; border-radius: 5px; font-family: EightBitsFont">
+                    <div style="text-align: center; margin-top: 50%">
+                        <Button @onclick="@(() => OpenCreateForm(account.FinancialAccountId))">Add</Button>
+                    </div>
+                </Card>
             </GridCol>
         </GridRow>
     }
@@ -116,7 +117,7 @@ else
         var message = modal.Show<CategoriesAdd>("Create category", parameters);
         var result = await message.Result;
 
-        if (result.Confirmed)
+        if (result.Confirmed && result.Data != null)
         {
             alertMessage = result.Data.ToString();
             StateHasChanged();
