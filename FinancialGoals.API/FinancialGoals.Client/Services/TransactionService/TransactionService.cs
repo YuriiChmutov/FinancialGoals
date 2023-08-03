@@ -14,11 +14,20 @@ public class TransactionService : ITransactionService
     }
 
     public event Action? OnChange;
-    public TransactionsDataDTO TransactionsData { get; set; } = new TransactionsDataDTO();
+    public int CurrentPage { get; set; } = 1;
+    public int PageCount { get; set; } = 0;
+
+    public List<TransactionToReturn> Transactions { get; set; } = new List<TransactionToReturn>();
     
     public async Task GetTransactions(int page)
     {
-        TransactionsData = await _http.GetFromJsonAsync<TransactionsDataDTO>($"https://localhost:7128/api/Transactions/user-transactions/{page}");
+        var result = await _http.GetFromJsonAsync<TransactionsDataDTO>($"https://localhost:7128/api/Transactions/user-transactions/{page}");
+        if (result is {Transactions: not null})
+        {
+            Transactions = result.Transactions;
+            CurrentPage = result.CurrentPage;
+            PageCount = result.Pages;
+        }
     }
 
     public Task<TransactionToReturn> GetTransaction(int transactionId)
@@ -29,7 +38,6 @@ public class TransactionService : ITransactionService
     public async Task<bool> AddTransaction(TransactionToCreate transaction)
     {
         var response = await _http.PostAsJsonAsync($"https://localhost:7128/api/Transactions", transaction);
-        // OnChange.Invoke();
         return response.StatusCode == HttpStatusCode.OK ? true : false;
     }
 }

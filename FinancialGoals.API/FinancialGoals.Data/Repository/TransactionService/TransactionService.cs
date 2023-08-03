@@ -37,7 +37,7 @@ public class TransactionService : ITransactionService
 
         var pageCount = Math.Ceiling(data.Count / pageResults);
 
-        var transactions = data.Skip((page - 1) * (int) pageCount).Take((int) pageResults).ToList();
+        var transactions = data.Skip((page - 1) * (int) pageResults).Take((int) pageResults).ToList();
 
         return new TransactionsDataDTO
         {

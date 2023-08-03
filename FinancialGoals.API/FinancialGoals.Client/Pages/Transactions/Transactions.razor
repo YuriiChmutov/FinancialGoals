@@ -5,7 +5,7 @@
 @using FinancialGoals.Services
 @implements IDisposable
 
-<AntList Class="demo-loadmore-list" DataSource="@TransactionService.TransactionsData.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
+<AntList Class="demo-loadmore-list" DataSource="@TransactionService.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
     <ChildContent Context="item">
         <ListItem Actions="actions">
             <ListItemMeta AvatarTemplate="avatar" Description="@item.Description">
@@ -22,15 +22,9 @@
             </div>
         </ListItem>
     </ChildContent>
-    <LoadMore>
-        @if (!InitLoading && !Loading)
-        {
-            <div class="demo-loadmore-btn-content ">
-                <Button OnClick="OnLoadMore">loading more</Button>
-            </div>
-        }
-    </LoadMore>
 </AntList>
+
+<Pagination Simple Current="@(TransactionService.CurrentPage)" Total="@(TransactionService.PageCount * 10)" OnChange="HandlePageChange" />
 
 @code {
     public bool InitLoading { get; set; } = true;
@@ -43,23 +37,25 @@
     
     protected override async Task OnInitializedAsync()
     {
-        await TransactionService.GetTransactions(1);
-        TransactionService.OnChange += StateHasChanged;
-        await base.OnInitializedAsync();
-        InitLoading = false;
+        await LoadData(TransactionService.CurrentPage);
     }
     
-    public async Task OnLoadMore()
-    {
-        Loading = true;
-        // var res = await GetData();
-        // Data.AddRange(res);
-        Loading = false;
-    }
-    
-
     public void Dispose()
     {
         TransactionService.OnChange -= StateHasChanged;
+    }
+    
+    private async Task LoadData(int page)
+    {
+        InitLoading = true;
+        await TransactionService.GetTransactions(page);
+        InitLoading = false;
+    }
+    
+    private async Task HandlePageChange(PaginationEventArgs args)
+    {
+        await LoadData(args.Page);
+        TransactionService.CurrentPage = args.Page;
+        TransactionService.OnChange += StateHasChanged;
     }
 }
