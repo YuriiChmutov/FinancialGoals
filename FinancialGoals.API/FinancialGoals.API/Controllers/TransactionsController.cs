@@ -23,13 +23,23 @@ namespace FinancialGoals.API.Controllers
             _transactionService = transactionService;
             _mapper = mapper;
         }
-
+        
         // GET: api/Transactions
         [HttpGet("user-transactions/{page}")]
         public async Task<ActionResult<TransactionsDataDTO>> GetTransactions(int page)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var transactionsFromRepo = await _transactionService.GetTransactionsForUserAsync(int.Parse(userId), page);
+            
+            return Ok(transactionsFromRepo);
+        }
+
+        // GET: api/Transactions
+        [HttpGet("user-transactions/{accountId}/{page}")]
+        public async Task<ActionResult<TransactionsDataDTO>> GetTransactions(int accountId, int page)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var transactionsFromRepo = await _transactionService.GetTransactionsForUserByAccountAsync(int.Parse(userId), accountId, page);
             
             return Ok(transactionsFromRepo);
         }
@@ -45,37 +55,6 @@ namespace FinancialGoals.API.Controllers
             var transactionToReturn = _mapper.Map<TransactionToReturn>(transactionFromRepo);
             return transactionToReturn;
         }
-
-        // // PUT: api/Transactions/5
-        // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> PutTransaction(int id, Transaction transaction)
-        // {
-        //     if (id != transaction.TransactionId)
-        //     {
-        //         return BadRequest();
-        //     }
-        //
-        //     var cate
-        //
-        //     try
-        //     {
-        //         await _context.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!TransactionExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
-        //
-        //     return NoContent();
-        // }
         
         // POST: api/Transactions
         [HttpPost]
@@ -87,30 +66,5 @@ namespace FinancialGoals.API.Controllers
             var transactionToReturn = _mapper.Map<Transaction>(transaction);
             return Ok(transactionToReturn);
         }
-        //
-        // // DELETE: api/Transactions/5
-        // [HttpDelete("{id}")]
-        // public async Task<IActionResult> DeleteTransaction(int id)
-        // {
-        //     if (_context.Transactions == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     var transaction = await _context.Transactions.FindAsync(id);
-        //     if (transaction == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //
-        //     _context.Transactions.Remove(transaction);
-        //     await _context.SaveChangesAsync();
-        //
-        //     return NoContent();
-        // }
-        //
-        // private bool TransactionExists(int id)
-        // {
-        //     return (_context.Transactions?.Any(e => e.TransactionId == id)).GetValueOrDefault();
-        // }
     }
 }

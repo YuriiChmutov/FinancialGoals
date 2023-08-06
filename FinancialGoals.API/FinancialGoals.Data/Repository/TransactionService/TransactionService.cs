@@ -46,6 +46,27 @@ public class TransactionService : ITransactionService
             CurrentPage = page
         };
     }
+    
+    public async Task<TransactionsDataDTO> GetTransactionsForUserByAccountAsync(int userId, int accountId, int page)
+    {
+        var pageResults = 5f;
+        var data = await _context.Transactions
+            .Include(t => t.FinancialAccount)
+            .Where(t => t.FinancialAccount.UserId == userId && t.FinancialAccountId == accountId)
+            .OrderByDescending(t => t.Date)
+            .ToListAsync();
+
+        var pageCount = Math.Ceiling(data.Count / pageResults);
+
+        var transactions = data.Skip((page - 1) * (int) pageResults).Take((int) pageResults).ToList();
+
+        return new TransactionsDataDTO
+        {
+            Transactions = _mapper.Map<List<TransactionToReturn>>(transactions),
+            Pages = (int) pageCount,
+            CurrentPage = page
+        };
+    }
 
     public async Task<List<Transaction>> GetTransactionsByDateAsync(int accountId, DateTime dateStart, DateTime? dateEnd = null)
     {

@@ -1,43 +1,80 @@
 ﻿@page "/transactions"
 
+
+@using FinancialGoals.Services
+@using FinancialGoals.Client.Services.AccountService
+@using FinancialGoals.Core.DTOs.Transaction
+
 @inject IModalService modal
 @inject ITransactionService TransactionService
-@using FinancialGoals.Services
+@inject IAccountService AccountService
 @implements IDisposable
 
-<AntList Class="demo-loadmore-list" DataSource="@TransactionService.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
-    <ChildContent Context="item">
-        <ListItem Actions="actions">
-            <ListItemMeta AvatarTemplate="avatar" Description="@item.Description">
-                <TitleTemplate>
-                    <a href="https://ant.design">@item.Type</a>
-                </TitleTemplate>
-            </ListItemMeta>
-            <div>
-                @{
-                    var sign = (item.Type == TransactionType.Income) ? "+" : "-";
-                }
-                
-                <p>@sign @item.Amount</p>
-            </div>
-        </ListItem>
-    </ChildContent>
-</AntList>
+@if (AccountService.Accounts == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <Segmented TValue="int" Block @bind-Value="@AccountService.CurrentAccountId"
+               OnChange="OnValueChanged"
+               DefaultValue="@AccountService.CurrentAccountId"
+               Style="font-family: EightBitsFont"
+               Size="SegmentedSize.Large">
+        @foreach (var account in AccountService.Accounts)
+        {
+            <SegmentedItem Label=@(account.Name) Value=@(account.FinancialAccountId) @key=@account.FinancialAccountId/>
+        }
+    </Segmented>
+}
 
-<Pagination Simple Current="@(TransactionService.CurrentPage)" Total="@(TransactionService.PageCount * 10)" OnChange="HandlePageChange" />
+@if (TransactionService.Transactions.Count > 0)
+{
+    <AntList Class="demo-loadmore-list" DataSource="@TransactionService.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
+        <ChildContent Context="item">
+            <ListItem Actions="actions">
+                <ListItemMeta AvatarTemplate="avatar" Description="@item.Description">
+                    <TitleTemplate>
+                        <a href="https://ant.design">@item.Type</a>
+                    </TitleTemplate>
+                </ListItemMeta>
+                <div>
+                    @{
+                        var sign = (item.Type == TransactionType.Income) ? "+" : "-";
+                    }
+                    <p>@sign @item.Amount</p>
+                </div>
+            </ListItem>
+        </ChildContent>
+    </AntList>
+
+    <Pagination Simple Current="@(TransactionService.CurrentPage)" Total="@(TransactionService.PageCount * 10)" OnChange="HandlePageChange" />
+}
+else
+{
+    <Divider>You don't have any transactions yet.</Divider>
+}
 
 @code {
     public bool InitLoading { get; set; } = true;
     public bool Loading { get; set; } = false;
     public RenderFragment[] actions = new[] { edit, add };
-    
+
+    private Dictionary<int, List<TransactionToReturn>> transactionsForAccounts = new Dictionary<int, List<TransactionToReturn>>(); 
+
     static RenderFragment avatar =@<Avatar Src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"></Avatar>;
     static RenderFragment edit = @<a key="list-loadmore-edit">edit</a>;
     static RenderFragment add = @<a key="list-loadmore-more">more</a>;
     
     protected override async Task OnInitializedAsync()
     {
-        await LoadData(TransactionService.CurrentPage);
+        await LoadData(AccountService.CurrentAccountId, TransactionService.CurrentPage);
+        if (AccountService.CurrentAccountId == 0)
+        {
+            AccountService.CurrentAccountId = AccountService.Accounts[0].FinancialAccountId;
+        }
     }
     
     public void Dispose()
@@ -45,17 +82,24 @@
         TransactionService.OnChange -= StateHasChanged;
     }
     
-    private async Task LoadData(int page)
+    private async Task LoadData(int accountId, int page)
     {
         InitLoading = true;
-        await TransactionService.GetTransactions(page);
+        // await TransactionService.GetTransactions(page);
+        await TransactionService.GetTransactionsForAccount(accountId, page);
         InitLoading = false;
     }
     
     private async Task HandlePageChange(PaginationEventArgs args)
     {
-        await LoadData(args.Page);
+        await LoadData(AccountService.CurrentAccountId, args.Page);
         TransactionService.CurrentPage = args.Page;
         TransactionService.OnChange += StateHasChanged;
+    }
+    
+    private async Task OnValueChanged(int value)
+    {
+        AccountService.CurrentAccountId = value;
+        await LoadData(AccountService.CurrentAccountId, TransactionService.CurrentPage);
     }
 }
