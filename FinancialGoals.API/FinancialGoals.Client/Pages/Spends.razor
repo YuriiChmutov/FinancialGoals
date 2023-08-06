@@ -48,6 +48,26 @@ else
                                            margin-right: auto; 
                                            margin-top: 45px"/>
                 </GridRow>
+                
+                <GridRow Style="width: 80%; margin: auto; padding-bottom: 5%">
+                    <GridCol Span="24">
+                        <GridRow Gutter="(16,24)">
+                            <GridCol Class="gutter-row" Span="12">
+                                <Button style=@styleForPlusMinusButton(transactionType[TransactionType.Income])
+                                        OnClick="@(() => { transactionType[TransactionType.Income] = true; transactionType[TransactionType.Expense] = false; StateHasChanged();})">
+                                    +
+                                </Button>
+                            </GridCol>
+                            <GridCol Class="gutter-row" Span="12">
+                                <Button style=@styleForPlusMinusButton(transactionType[TransactionType.Expense])
+                                        OnClick="@(() => { transactionType[TransactionType.Income] = false; transactionType[TransactionType.Expense] = true; StateHasChanged();})">
+                                    -
+                                </Button>
+                            </GridCol>
+                        </GridRow>
+                    </GridCol>
+                </GridRow>
+                
                 <GridRow Style=" width: 80%; margin: auto">
                     <GridCol Span="24">
                         <GridRow Gutter="(16,24)">
@@ -71,7 +91,7 @@ else
                     {
                         <GridCol Span="4" Style="margin-top: 45px; margin-left: 20px">
                             <div onclick="@(() => handleCategoryId(category.CategoryId))">
-                                <Card Hoverable Style="@(category.CategoryId == selectedCategoryId ? styleForCard : "width: 130px; border-radius: 5px;")" Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)">
+                                <Card Hoverable Style="@(category.CategoryId == selectedCategoryId ? styleForSelectedCategoryCard : "width: 130px; border-radius: 5px;")" Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)">
                                     <CardMeta Style="justify-content: center" Title="@category.Name" />
                                 </Card>
                             </div>
@@ -85,7 +105,6 @@ else
 
 @code
 {
-    private int selectedAccountId;
     private int selectedCategoryId;
     private string notes = string.Empty;
 
@@ -94,15 +113,30 @@ else
     private bool isNewInput = true;
     private bool addedSuccessfully = false;
 
-    string styleForCard = "width: 130px; border: 2px solid #001529; background-color: gold; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); border-radius: 5px;";
+    private Dictionary<TransactionType, bool> transactionType;
+
+    string styleForSelectedCategoryCard = "width: 130px; border: 2px solid #001529; background-color: gold; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); border-radius: 5px;";
+    string styleForPlusMinusButton (bool selected) => $"background: {(selected ? "gold" : "white" )}; padding: 8px 0; width: 100%; height: auto; font-size: 28px; border-radius: 5px;";
     string style="background: gold; padding: 8px 0; width: 100%; height: auto; font-size: 28px; border-radius: 5px;";
     
     protected override async Task OnInitializedAsync()
     {
-        await AccountService.GetAccounts();
-        await CategoryService.GetCategories();
-        selectedCategoryId = CategoryService.Categories[0].CategoryId;
-        selectedAccountId = AccountService.Accounts[0].FinancialAccountId;
+        if (AccountService.Accounts == null) await AccountService.GetAccounts();
+        if (CategoryService.Categories == null) await CategoryService.GetCategories();
+        
+        selectedCategoryId = CategoryService.Categories[0].CategoryId; // todo: fix
+
+        transactionType = new Dictionary<TransactionType, bool>
+        {
+            {TransactionType.Expense, true},
+            {TransactionType.Income, false}
+        };
+
+        if (AccountService.CurrentAccountId == 0)
+        {
+            AccountService.CurrentAccountId = AccountService.Accounts[0].FinancialAccountId;
+        }
+        
         AccountService.OnChange += StateHasChanged;
     }
 
@@ -154,10 +188,10 @@ else
         {
             var transaction = new TransactionToCreate
             {
-                FinancialAccountId = selectedAccountId,
+                FinancialAccountId = AccountService.CurrentAccountId,
                 CategoryId = selectedCategoryId,
                 Date = DateTime.Now,
-                Type = TransactionType.Expense,
+                Type = transactionType[TransactionType.Expense] ? TransactionType.Expense : TransactionType.Income,
                 Amount = (int)currentInput,
                 Description = notes
             };
