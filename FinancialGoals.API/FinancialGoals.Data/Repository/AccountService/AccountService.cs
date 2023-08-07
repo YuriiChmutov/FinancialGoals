@@ -1,5 +1,6 @@
 ﻿using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
+using FinancialGoals.Data.Repository.CategoryService;
 using FinancialGoals.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,12 +9,10 @@ namespace FinancialGoals.Data.Repository.AccountService;
 public class AccountService : IAccountService
 {
     private readonly FinancialDbContext _context;
-    private readonly BlobStorageService _blobStorageService;
 
-    public AccountService(FinancialDbContext context, BlobStorageService blobStorageService)
+    public AccountService(FinancialDbContext context)
     {
         _context = context;
-        _blobStorageService = blobStorageService;
     }
 
     public async Task<List<FinancialAccount>> GetUserAccountsAsync(int userId)

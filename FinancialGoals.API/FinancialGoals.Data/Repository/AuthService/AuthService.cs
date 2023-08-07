@@ -5,6 +5,9 @@ using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using AutoMapper;
+using FinancialGoals.Core.DTOs.Account;
+using FinancialGoals.Data.Repository.AccountService;
 using FinancialGoals.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -15,11 +18,15 @@ public class AuthService : IAuthService
 {
     private readonly FinancialDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IMapper _mapper;
+    private readonly IAccountService _accountService;
 
-    public AuthService(FinancialDbContext context, IConfiguration configuration)
+    public AuthService(FinancialDbContext context, IConfiguration configuration, IMapper mapper, IAccountService accountService)
     {
         _context = context;
         _configuration = configuration;
+        _mapper = mapper;
+        _accountService = accountService;
     }
 
     public async Task<ServiceResponse<string>> Register(User user, string password)
@@ -37,8 +44,39 @@ public class AuthService : IAuthService
 
         user.PasswordHash = passwordHash;
         user.PasswordSalt = passwordSalt;
-
+        
+        var account = _mapper.Map<FinancialAccount>(new AccountToCreate
+        {
+            CurrencyType = CurrencyType.UAH,
+            UserId = user.UserId
+        });
+        account.User = user;
+        account.Categories = new List<Category>();
+        
+        var defaultCategories = new List<Category>
+        {
+            new Category
+            {
+                Name = "Income",
+                Default = true,
+                ImageName = "income.png",
+                Limit = 0,
+                TransactionType = TransactionType.Income
+            },
+            new Category
+            {
+                Name = "Shopping",
+                Default = true,
+                ImageName = "shopping-basket.png",
+                Limit = 0,
+                TransactionType = TransactionType.Expense
+            }
+        };
+        
+        account.Categories.AddRange(defaultCategories);
         _context.Users.Add(user);
+        _context.FinancialAccounts.Add(account);
+        
         await _context.SaveChangesAsync();
 
         return new ServiceResponse<string>
