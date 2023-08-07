@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinancialGoals.Data.Migrations
 {
     [DbContext(typeof(FinancialDbContext))]
-    [Migration("20230730101040_AddNumberPropertyForFinancialAccount")]
-    partial class AddNumberPropertyForFinancialAccount
+    [Migration("20230807145221_AddTransactionTypeForCategory")]
+    partial class AddTransactionTypeForCategory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,21 +23,6 @@ namespace FinancialGoals.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("CategoryFinancialAccount", b =>
-                {
-                    b.Property<int>("CategoriesCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FinancialAccountsFinancialAccountId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CategoriesCategoryId", "FinancialAccountsFinancialAccountId");
-
-                    b.HasIndex("FinancialAccountsFinancialAccountId");
-
-                    b.ToTable("CategoryFinancialAccount");
-                });
 
             modelBuilder.Entity("FinancialAccountGoal", b =>
                 {
@@ -65,6 +50,9 @@ namespace FinancialGoals.Data.Migrations
                     b.Property<bool>("Default")
                         .HasColumnType("bit");
 
+                    b.Property<int>("FinancialAccountId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ImageName")
                         .HasColumnType("nvarchar(max)");
 
@@ -75,7 +63,12 @@ namespace FinancialGoals.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
+
                     b.HasKey("CategoryId");
+
+                    b.HasIndex("FinancialAccountId");
 
                     b.ToTable("Categories");
                 });
@@ -224,21 +217,6 @@ namespace FinancialGoals.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CategoryFinancialAccount", b =>
-                {
-                    b.HasOne("FinancialGoals.Core.Models.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FinancialGoals.Core.Models.FinancialAccount", null)
-                        .WithMany()
-                        .HasForeignKey("FinancialAccountsFinancialAccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("FinancialAccountGoal", b =>
                 {
                     b.HasOne("FinancialGoals.Core.Models.FinancialAccount", null)
@@ -252,6 +230,17 @@ namespace FinancialGoals.Data.Migrations
                         .HasForeignKey("GoalsGoalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FinancialGoals.Core.Models.Category", b =>
+                {
+                    b.HasOne("FinancialGoals.Core.Models.FinancialAccount", "FinancialAccount")
+                        .WithMany("Categories")
+                        .HasForeignKey("FinancialAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FinancialAccount");
                 });
 
             modelBuilder.Entity("FinancialGoals.Core.Models.FinancialAccount", b =>
@@ -291,6 +280,8 @@ namespace FinancialGoals.Data.Migrations
 
             modelBuilder.Entity("FinancialGoals.Core.Models.FinancialAccount", b =>
                 {
+                    b.Navigation("Categories");
+
                     b.Navigation("Transactions");
                 });
 

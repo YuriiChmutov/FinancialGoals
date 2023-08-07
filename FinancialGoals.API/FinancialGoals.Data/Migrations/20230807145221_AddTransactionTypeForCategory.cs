@@ -4,22 +4,22 @@
 
 namespace FinancialGoals.Data.Migrations
 {
-    public partial class AddLimitForCategory : Migration
+    public partial class AddTransactionTypeForCategory : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<decimal>(
-                name: "Limit",
+            migrationBuilder.AddColumn<int>(
+                name: "TransactionType",
                 table: "Categories",
-                type: "decimal(18,2)",
+                type: "int",
                 nullable: false,
-                defaultValue: 0m);
+                defaultValue: 0);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Limit",
+                name: "TransactionType",
                 table: "Categories");
         }
     }

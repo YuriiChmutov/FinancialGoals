@@ -14,10 +14,5 @@ namespace FinancialGoals.Core.Models
         public List<Transaction>? Transactions { get; set; }
         public List<Goal>? Goals { get; set; }
         public List<Category> Categories { get; set; }
-
-        public FinancialAccount()
-        {
-            Categories = new List<Category>();
-        }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinancialGoals.Data.Migrations
 {
     [DbContext(typeof(FinancialDbContext))]
-    [Migration("20230716084414_ChangeCurrencyTypeForFinancialAccoutn")]
-    partial class ChangeCurrencyTypeForFinancialAccoutn
+    [Migration("20230807085321_NewDB")]
+    partial class NewDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,6 +47,15 @@ namespace FinancialGoals.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"), 1L, 1);
 
+                    b.Property<bool>("Default")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("FinancialAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("Limit")
                         .HasColumnType("decimal(18,2)");
 
@@ -55,6 +64,8 @@ namespace FinancialGoals.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CategoryId");
+
+                    b.HasIndex("FinancialAccountId");
 
                     b.ToTable("Categories");
                 });
@@ -76,6 +87,9 @@ namespace FinancialGoals.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Number")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -163,6 +177,9 @@ namespace FinancialGoals.Data.Migrations
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -171,8 +188,18 @@ namespace FinancialGoals.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.Property<int?>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Role")
@@ -200,6 +227,17 @@ namespace FinancialGoals.Data.Migrations
                         .HasForeignKey("GoalsGoalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FinancialGoals.Core.Models.Category", b =>
+                {
+                    b.HasOne("FinancialGoals.Core.Models.FinancialAccount", "FinancialAccount")
+                        .WithMany("Categories")
+                        .HasForeignKey("FinancialAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FinancialAccount");
                 });
 
             modelBuilder.Entity("FinancialGoals.Core.Models.FinancialAccount", b =>
@@ -239,6 +277,8 @@ namespace FinancialGoals.Data.Migrations
 
             modelBuilder.Entity("FinancialGoals.Core.Models.FinancialAccount", b =>
                 {
+                    b.Navigation("Categories");
+
                     b.Navigation("Transactions");
                 });
 

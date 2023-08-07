@@ -1,4 +1,6 @@
-﻿namespace FinancialGoals.Core.Models
+﻿using FinancialGoals.Services;
+
+namespace FinancialGoals.Core.Models
 {
     public class Category
     {
@@ -7,12 +9,9 @@
         public decimal Limit { get; set; }
         public string? ImageName { get; set; }
         public List<Transaction>? Transactions { get; set; }
-        public List<FinancialAccount> FinancialAccounts { get; set; }
+        public FinancialAccount FinancialAccount { get; set; }
+        public int FinancialAccountId { get; set; }
         public bool Default { get; set; } = false;
-
-        public Category()
-        {
-            FinancialAccounts = new List<FinancialAccount>();
-        }
+        public TransactionType TransactionType { get; set; } = TransactionType.Expense;
     }
 }
