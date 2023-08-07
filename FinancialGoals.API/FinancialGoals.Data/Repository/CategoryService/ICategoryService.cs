@@ -15,5 +15,4 @@ public interface ICategoryService
     // Task UpdateCategoryByUserIdAsync(int categoryId, Category category, int userId);
     Task DeleteCategoryAsync(int id);
     Task<List<Category>> GetDefaultCategories();
-    Task<List<Category>> CreateDefaultCategories(int accountId);
 }

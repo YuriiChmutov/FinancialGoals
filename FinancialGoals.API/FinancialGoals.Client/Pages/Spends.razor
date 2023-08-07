@@ -54,13 +54,13 @@ else
                         <GridRow Gutter="(16,24)">
                             <GridCol Class="gutter-row" Span="12">
                                 <Button style=@styleForPlusMinusButton(transactionType[TransactionType.Income])
-                                        OnClick="@(() => { transactionType[TransactionType.Income] = true; transactionType[TransactionType.Expense] = false; StateHasChanged();})">
+                                        OnClick="HandlePlusButtonClick">
                                     +
                                 </Button>
                             </GridCol>
                             <GridCol Class="gutter-row" Span="12">
                                 <Button style=@styleForPlusMinusButton(transactionType[TransactionType.Expense])
-                                        OnClick="@(() => { transactionType[TransactionType.Income] = false; transactionType[TransactionType.Expense] = true; StateHasChanged();})">
+                                        OnClick="HandleMinusButtonClick">
                                     -
                                 </Button>
                             </GridCol>
@@ -87,16 +87,35 @@ else
             </GridCol>
             <GridCol Span="12">
                 <GridRow>
-                    @foreach (var category in CategoryService.Categories.Where(x => x.FinancialAccountIds.Contains(AccountService.CurrentAccountId)))
+                    @if (transactionType[TransactionType.Expense])
                     {
-                        <GridCol Span="4" Style="margin-top: 45px; margin-left: 20px">
-                            <div onclick="@(() => handleCategoryId(category.CategoryId))">
-                                <Card Hoverable Style="@(category.CategoryId == selectedCategoryId ? styleForSelectedCategoryCard : "width: 130px; border-radius: 5px;")" Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)">
-                                    <CardMeta Style="justify-content: center" Title="@category.Name" />
-                                </Card>
-                            </div>
-                        </GridCol>
+                        foreach (var category in CategoryService.Categories
+                            .Where(x => x.FinancialAccountId == AccountService.CurrentAccountId && x.TransactionType == TransactionType.Expense))
+                        {
+                            <GridCol Span="4" Style="margin-top: 45px; margin-left: 20px">
+                                <div onclick="@(() => handleCategoryId(category.CategoryId))">
+                                    <Card Hoverable Style="@(category.CategoryId == selectedCategoryId ? styleForSelectedCategoryCard : "width: 130px; border-radius: 5px;")" Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)">
+                                        <CardMeta Style="justify-content: center" Title="@category.Name"/>
+                                    </Card>
+                                </div>
+                            </GridCol>
+                        }
                     }
+                    else
+                    {
+                        foreach (var category in CategoryService.Categories
+                            .Where(x => x.FinancialAccountId == AccountService.CurrentAccountId && x.TransactionType == TransactionType.Income))
+                        {
+                            <GridCol Span="4" Style="margin-top: 45px; margin-left: 20px">
+                                <div onclick="@(() => handleCategoryId(category.CategoryId))">
+                                    <Card Hoverable Style="@(category.CategoryId == selectedCategoryId ? styleForSelectedCategoryCard : "width: 130px; border-radius: 5px;")" Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)">
+                                        <CardMeta Style="justify-content: center" Title="@category.Name"/>
+                                    </Card>
+                                </div>
+                            </GridCol>
+                        }
+                    }
+                    
                 </GridRow>
             </GridCol>
         </GridRow>
@@ -124,18 +143,14 @@ else
         if (AccountService.Accounts == null) await AccountService.GetAccounts();
         if (CategoryService.Categories == null) await CategoryService.GetCategories();
         
-        selectedCategoryId = CategoryService.Categories[0].CategoryId; // todo: fix
+        AccountService.CurrentAccountId = AccountService.Accounts[0].FinancialAccountId;
+        selectedCategoryId = CategoryService.Categories.First(x => x.FinancialAccountId == AccountService.CurrentAccountId).CategoryId;
 
         transactionType = new Dictionary<TransactionType, bool>
         {
             {TransactionType.Expense, true},
             {TransactionType.Income, false}
         };
-
-        if (AccountService.CurrentAccountId == 0)
-        {
-            AccountService.CurrentAccountId = AccountService.Accounts[0].FinancialAccountId;
-        }
         
         AccountService.OnChange += StateHasChanged;
     }
@@ -148,6 +163,9 @@ else
     private void OnValueChanged(int value)
     {
         AccountService.CurrentAccountId = value;
+        selectedCategoryId = CategoryService.Categories
+            .First(x => x.FinancialAccountId == AccountService.CurrentAccountId 
+                        && x.TransactionType == (transactionType[TransactionType.Income] ? TransactionType.Income : TransactionType.Expense)).CategoryId;
     }
     
     private string getImageDataFromBytes(byte[] imageData)
@@ -163,6 +181,26 @@ else
     {
         this.selectedCategoryId = value;
         StateHasChanged();
+    }
+
+    private async Task HandlePlusButtonClick()
+    {
+        transactionType[TransactionType.Income] = true; 
+        transactionType[TransactionType.Expense] = false; 
+        selectedCategoryId = CategoryService.Categories
+            .First(x => x.FinancialAccountId == AccountService.CurrentAccountId && x.TransactionType == TransactionType.Income).CategoryId;
+
+        CategoryService.OnChange += StateHasChanged;
+    }
+    
+    private async Task HandleMinusButtonClick()
+    {
+        transactionType[TransactionType.Income] = false; 
+        transactionType[TransactionType.Expense] = true; 
+        selectedCategoryId = CategoryService.Categories
+            .First(x => x.FinancialAccountId == AccountService.CurrentAccountId && x.TransactionType == TransactionType.Expense).CategoryId;
+
+        CategoryService.OnChange += StateHasChanged;
     }
     
     private async Task HandleButtonClick(string button)

@@ -1,4 +1,6 @@
-﻿namespace FinancialGoals.Core.DTOs.Category;
+﻿using FinancialGoals.Services;
+
+namespace FinancialGoals.Core.DTOs.Category;
 
 public class CategoryToReturn
 {
@@ -7,5 +9,6 @@ public class CategoryToReturn
     public decimal Amount { get; set; } = 0;
     public decimal Limit { get; set; } = 0;
     public ImageData Image { get; set; }
-    public List<int> FinancialAccountIds { get; set; }
+    public int FinancialAccountId { get; set; }
+    public TransactionType TransactionType { get; set; }
 }

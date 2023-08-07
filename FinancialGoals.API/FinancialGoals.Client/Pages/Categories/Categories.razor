@@ -4,8 +4,6 @@
 @inject ICategoryService CategoryService
 @inject ImageService ImageService
 @inject IAccountService AccountService
-@using Microsoft.VisualBasic
-@using FinancialGoals.Client.Services
 @using FinancialGoals.Client.Services.AccountService
 @using ImageService = FinancialGoals.Client.Services.ImageService
 @using ModalOptions = Blazored.Modal.ModalOptions
@@ -42,7 +40,7 @@ else
         <GridRow>
             @foreach (var category in CategoryService.Categories)
             {
-                if (category.FinancialAccountIds.Contains(account.FinancialAccountId))
+                if (category.FinancialAccountId == account.FinancialAccountId)
                 {
                     <GridCol Span="6">
                         <Card Class="mb-3"
@@ -54,7 +52,7 @@ else
                               Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
                             Title=@(category.Name)
                             Actions="@(new[] {
-                                         actionEdit(() => OpenEditForm(category.CategoryId)), 
+                                         actionEdit(() => OpenEditForm(category.CategoryId, account.FinancialAccountId)), 
                                          actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })">
                             <Divider Orientation="center">
                                 @* <img src="@convert(category.Image.ImageBytes)"/> *@
@@ -124,9 +122,11 @@ else
         }
     }
     
-    private void OpenEditForm(int ItemId)
+    private void OpenEditForm(int ItemId, int AccountId)
     {
-        var parameters = new ModalParameters().Add(nameof(CategoriesEdit.ItemId), ItemId);
+        var parameters = new ModalParameters()
+            .Add(nameof(CategoriesEdit.ItemId), ItemId)
+            .Add("AccountId", AccountId);
         modal.Show<CategoriesEdit>("Edit category", parameters);
     }
 

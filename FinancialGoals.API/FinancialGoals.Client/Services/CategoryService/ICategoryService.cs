@@ -11,7 +11,7 @@ public interface ICategoryService
     Task<CategoryToReturn> GetCategory(int categoryId);
     Task<bool> AddCategory(CategoryToCreate category, int accountId);
     CategoryToCreate CreateNewCategory();
-    Task<bool> UpdateCategory(CategoryToUpdate category);
+    Task<bool> UpdateCategory(CategoryToUpdate category, int accountId);
     Task DeleteCategory(int id);
     Task<string> GetImageUrl();
     Task Clean();

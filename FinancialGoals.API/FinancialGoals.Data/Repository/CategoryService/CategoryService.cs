@@ -1,4 +1,6 @@
-﻿using FinancialGoals.Core.Models;
+﻿using FinancialGoals.Core.DTOs;
+using FinancialGoals.Core.DTOs.Category;
+using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
 using FinancialGoals.Services;
 using Microsoft.EntityFrameworkCore;
@@ -34,8 +36,8 @@ public class CategoryService : ICategoryService
     public async Task<List<Category>> GetCategoriesByUserIdAsync(int userId)
     {
         return await _context.Categories
-            .Include(c => c.FinancialAccounts
-                .Where(x => x.UserId == userId)).ToListAsync();
+            .Include(x => x.FinancialAccount)
+            .Where(x => x.FinancialAccount.UserId == userId).ToListAsync();
     }
 
     public async Task<bool> CategoryExistsAsync(int id)
@@ -56,9 +58,7 @@ public class CategoryService : ICategoryService
     
     public async Task AddCategoryForAccountAsync(Category category, int userId, int accountId)
     {
-        var account = await _context.FinancialAccounts
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.FinancialAccountId == accountId);
-        category.FinancialAccounts.Add(account);
+        category.FinancialAccountId = accountId; // todo: 
         _context.Categories.Add(category);
         await _context.SaveChangesAsync();
     }
@@ -72,18 +72,16 @@ public class CategoryService : ICategoryService
     public async Task DeleteCategoryAsync(int id)
     {
         var category = await _context.Categories.FindAsync(id);
-        await _blobStorageService.DeleteImageAsync(category.ImageName);
-        _context.Categories.Remove(category);
-        await _context.SaveChangesAsync();
+        if (!category.Default)
+        {
+            await _blobStorageService.DeleteImageAsync(category.ImageName);
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task<List<Category>> GetDefaultCategories()
     {
         return await _context.Categories.Where(c => c.Default).ToListAsync();
-    }
-
-    public async Task<List<Category>> CreateDefaultCategories(int accountId)
-    {
-        return new List<Category>();
     }
 }

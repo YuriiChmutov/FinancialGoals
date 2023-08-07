@@ -44,9 +44,9 @@ public class CategoryService : ICategoryService
         return newCategory;
     }
 
-    public async Task<bool> UpdateCategory(CategoryToUpdate categoryModified)
+    public async Task<bool> UpdateCategory(CategoryToUpdate categoryModified, int accountId)
     {
-        var response = await _http.PutAsJsonAsync($"https://localhost:7128/api/Categories/{categoryModified.CategoryId}", categoryModified);
+        var response = await _http.PutAsJsonAsync($"https://localhost:7128/api/Categories/{accountId}/{categoryModified.CategoryId}", categoryModified);
         await GetCategories();
         OnChange.Invoke();
 

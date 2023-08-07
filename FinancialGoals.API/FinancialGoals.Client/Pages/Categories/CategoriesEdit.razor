@@ -67,8 +67,12 @@ else
 }
 
 @code {
-    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
-    [Parameter] public int ItemId { get; set; }
+    [CascadingParameter] 
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] 
+    public int ItemId { get; set; }
+    [Parameter]
+    public int AccountId { get; set; }
     
     private CategoryToUpdate categoryModified;
     string imageUrl;
@@ -137,7 +141,7 @@ else
         {
             categoryModified.Changed.Name = true;
         }
-        var result = await CategoryService.UpdateCategory(categoryModified);
+        var result = await CategoryService.UpdateCategory(categoryModified, AccountId);
         if (result) await BlazoredModal.CloseAsync();
     }
     

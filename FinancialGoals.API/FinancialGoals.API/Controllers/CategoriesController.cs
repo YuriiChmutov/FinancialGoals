@@ -91,8 +91,8 @@ namespace FinancialGoals.API.Controllers
         
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(int id, CategoryToUpdate modifiedCategory)
+        [HttpPut("{accountId}/{id}")]
+        public async Task<IActionResult> PutCategory(int accountId, int id, CategoryToUpdate modifiedCategory)
         {
             if (id != modifiedCategory.CategoryId)
             {
@@ -100,7 +100,8 @@ namespace FinancialGoals.API.Controllers
             }
 
             var categoryToUpdate = _mapper.Map<Category>(modifiedCategory);
-
+            categoryToUpdate.FinancialAccountId = accountId;
+            
             try
             {
                 await _categoryService.UpdateCategoryAsync(id, categoryToUpdate);
