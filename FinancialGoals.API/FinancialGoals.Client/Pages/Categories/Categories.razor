@@ -5,6 +5,7 @@
 @inject ImageService ImageService
 @inject IAccountService AccountService
 @using FinancialGoals.Client.Services.AccountService
+@using FinancialGoals.Services
 @using ImageService = FinancialGoals.Client.Services.ImageService
 @using ModalOptions = Blazored.Modal.ModalOptions
 @implements IDisposable
@@ -48,16 +49,19 @@ else
                               width: 300px; 
                               background-color: #00ffff; 
                               font-family: EightBitsFont; 
-                              border-color: #FFD700; border-width: thick; border-radius: 5px" 
+                              border-color: #FFD700; border-width: thick; border-radius: 5px"
                               Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
-                            Title=@(category.Name)
-                            Actions="@(new[] {
-                                         actionEdit(() => OpenEditForm(category.CategoryId, account.FinancialAccountId)), 
-                                         actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name)) })">
-                            <Divider Orientation="center">
-                                @* <img src="@convert(category.Image.ImageBytes)"/> *@
-                                @category.Amount / @category.Limit
-                            </Divider>
+                              Title=@category.Name
+                              Actions="@(new[] { actionEdit(() => OpenEditForm(category.CategoryId, account.FinancialAccountId)), actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name))})">
+                            <Extra>
+                                @cardTitleArrow(category.TransactionType)
+                            </Extra>
+                            <Body>
+                                <Divider Orientation="center">
+                                    @* <img src="@convert(category.Image.ImageBytes)"/> *@
+                                    @category.Amount / @category.Limit
+                                </Divider>
+                            </Body>
                         </Card>
                     </GridCol>
                 }
@@ -101,6 +105,10 @@ else
 
     RenderFragment actionEdit(Action clickAction) => @<Icon Type="edit" OnClick="@clickAction"/>;
     RenderFragment actionDelete(Action clickAction) =>@<Icon Type="delete" OnClick="@clickAction"/>;
+
+    RenderFragment cardTitleArrow(TransactionType type) => type == TransactionType.Expense ? 
+        @<i class="oi oi-arrow-thick-top" style="color: #FA8072"></i> : 
+        @<i class="oi oi-arrow-thick-bottom" style="color: #BDB76B"></i>;
 
     private async Task OpenCreateForm(int accountId)
     {

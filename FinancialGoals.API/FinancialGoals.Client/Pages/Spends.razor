@@ -143,7 +143,10 @@ else
         if (AccountService.Accounts == null) await AccountService.GetAccounts();
         if (CategoryService.Categories == null) await CategoryService.GetCategories();
         
-        AccountService.CurrentAccountId = AccountService.Accounts[0].FinancialAccountId;
+        if (AccountService.CurrentAccountId < 1)
+        {
+            AccountService.CurrentAccountId = AccountService.Accounts[0].FinancialAccountId;
+        }
         selectedCategoryId = CategoryService.Categories.First(x => x.FinancialAccountId == AccountService.CurrentAccountId).CategoryId;
 
         transactionType = new Dictionary<TransactionType, bool>
