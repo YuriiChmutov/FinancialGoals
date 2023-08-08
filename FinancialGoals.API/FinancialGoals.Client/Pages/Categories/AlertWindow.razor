@@ -1,0 +1,20 @@
+﻿@if (AlertType == "edit")
+{
+    <Alert Type="info" 
+           Message="This category is default and can't be edited." 
+           Style="font-family: EightBitsFont;"
+           ShowIcon="true" 
+           Banner/>
+}
+else
+{
+    <Alert Type="warning" 
+           Message="This category is default and can't be deleted." 
+           Style="font-family: EightBitsFont;"
+           ShowIcon="true" 
+           Banner/>
+}
+
+@code {
+    [Parameter] public string AlertType { get; set; }
+}

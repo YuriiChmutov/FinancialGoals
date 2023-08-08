@@ -11,4 +11,5 @@ public class CategoryToReturn
     public ImageData Image { get; set; }
     public int FinancialAccountId { get; set; }
     public TransactionType TransactionType { get; set; }
+    public bool Default { get; set; }
 }

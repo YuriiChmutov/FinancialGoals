@@ -14,6 +14,7 @@
 {
     <Alert Type="@AlertType.Success" Message="@alertMessage" Closable Style="font-family: EightBitsFont"/>
 }
+
 <PageTitle>Categories</PageTitle>
 <GridRow Style="font-family: EightBitsFont">
     <GridCol Span="12">
@@ -45,22 +46,32 @@ else
                 {
                     <GridCol Span="6">
                         <Card Class="mb-3"
-                              Style="
-                              width: 300px; 
-                              background-color: #00ffff; 
-                              font-family: EightBitsFont; 
-                              border-color: #FFD700; border-width: thick; border-radius: 5px"
+                              Style=@GetCardStyle(category.Default)
                               Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
                               Title=@category.Name
-                              Actions="@(new[] { actionEdit(() => OpenEditForm(category.CategoryId, account.FinancialAccountId)), actionDelete(() => OpenDeleteForm(category.CategoryId, category.Name))})">
+                              Actions="@(new[] 
+                                       {
+                                           actionEdit(!category.Default ? () => OpenEditForm(category.CategoryId, account.FinancialAccountId) : () => ShowAlertWindow("edit")), 
+                                           actionDelete(!category.Default ? () => OpenDeleteForm(category.CategoryId, category.Name) : () => ShowAlertWindow("delete"))
+                                       })">
                             <Extra>
                                 @cardTitleArrow(category.TransactionType)
                             </Extra>
                             <Body>
-                                <Divider Orientation="center">
-                                    @* <img src="@convert(category.Image.ImageBytes)"/> *@
-                                    @category.Amount / @category.Limit
-                                </Divider>
+                            <Divider Orientation="center">
+                                @if (category.Default)
+                                {
+                                    <span>
+                                        @category.Amount
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @category.Amount / @category.Limit
+                                    </span>
+                                }
+                            </Divider>
                             </Body>
                         </Card>
                     </GridCol>
@@ -81,6 +92,11 @@ else
     private Stream imageStream;
     private string imageSource;
     private string alertMessage = string.Empty;
+    private bool canBeChanged = true;
+    private bool canBeDeleted = true;
+
+    private string backgroundColorForCard(bool isDefault) => !isDefault ? "00ffff" : "#B0E0E6";
+    private string GetCardStyle(bool isDefault) => $"width: 300px; background-color: {backgroundColorForCard(isDefault)}; font-family: EightBitsFont; border-color: #FFD700; border-width: thick; border-radius: 5px;";
     
     protected override async Task OnInitializedAsync()
     {
@@ -109,7 +125,7 @@ else
     RenderFragment cardTitleArrow(TransactionType type) => type == TransactionType.Expense ? 
         @<i class="oi oi-arrow-thick-top" style="color: #FA8072"></i> : 
         @<i class="oi oi-arrow-thick-bottom" style="color: #BDB76B"></i>;
-
+    
     private async Task OpenCreateForm(int accountId)
     {
         var options = new ModalOptions() 
@@ -137,11 +153,18 @@ else
             .Add("AccountId", AccountId);
         modal.Show<CategoriesEdit>("Edit category", parameters);
     }
-
+    
     private void OpenDeleteForm(int ItemId, string ItemName)
     {
         var parameters = new ModalParameters()
             .Add(nameof(CategoriesEdit.ItemId), ItemId);
         modal.Show<CategoryDelete>($"Are you sure that you want to delete '{ItemName}' category?", parameters);
+    }
+
+    private void ShowAlertWindow(string type)
+    {
+        var parameters = new ModalParameters()
+            .Add("AlertType", type);
+        modal.Show<AlertWindow>("Edit category", parameters);
     }
 }
