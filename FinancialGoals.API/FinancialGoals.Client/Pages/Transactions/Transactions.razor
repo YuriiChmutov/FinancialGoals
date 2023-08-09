@@ -35,7 +35,7 @@ else
     <AntList Class="demo-loadmore-list" DataSource="@TransactionService.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
         <ChildContent Context="item">
             <ListItem Actions="actions">
-                <ListItemMeta AvatarTemplate="avatar" Description="@item.Description">
+                <ListItemMeta AvatarTemplate="imageFragment(item.CategoryToReturn.Image.ImageBytes, item.CategoryToReturn.Image.ImageName)" Description="@item.Description">
                     <TitleTemplate>
                         <a href="https://ant.design">@item.Type</a>
                     </TitleTemplate>
@@ -85,7 +85,6 @@ else
     private async Task LoadData(int accountId, int page)
     {
         InitLoading = true;
-        // await TransactionService.GetTransactions(page);
         await TransactionService.GetTransactionsForAccount(accountId, page);
         InitLoading = false;
     }
@@ -101,5 +100,14 @@ else
     {
         AccountService.CurrentAccountId = value;
         await LoadData(AccountService.CurrentAccountId, TransactionService.CurrentPage);
+    }
+    
+    RenderFragment imageFragment (byte[] imageData, string imageName) => 
+        @<img Style="width: 50px; margin: auto" alt="@imageName" src="@getImageDataFromBytes(imageData)" />;
+    
+    private string getImageDataFromBytes(byte[] imageData)
+    {
+        string base64Image = Convert.ToBase64String(imageData);
+        return $"data:image/png;base64,{base64Image}";
     }
 }

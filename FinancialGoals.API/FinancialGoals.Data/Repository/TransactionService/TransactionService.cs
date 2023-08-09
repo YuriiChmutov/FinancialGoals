@@ -52,14 +52,15 @@ public class TransactionService : ITransactionService
         var pageResults = 5f;
         var data = await _context.Transactions
             .Include(t => t.FinancialAccount)
+            .Include(t => t.Category)
             .Where(t => t.FinancialAccount.UserId == userId && t.FinancialAccountId == accountId)
             .OrderByDescending(t => t.Date)
             .ToListAsync();
-
+        
         var pageCount = Math.Ceiling(data.Count / pageResults);
 
         var transactions = data.Skip((page - 1) * (int) pageResults).Take((int) pageResults).ToList();
-
+        
         return new TransactionsDataDTO
         {
             Transactions = _mapper.Map<List<TransactionToReturn>>(transactions),
