@@ -25,9 +25,13 @@
 
 @if (CategoryService.Categories == null)
 {
-    <p style="font-family: EightBitsFont">
-        <em>Loading...</em>
-    </p>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <GridRow Align="middle">
+            <GridCol Span="24" >
+                <Spin/>
+            </GridCol>
+        </GridRow>
+    </div>
 }
 else
 {

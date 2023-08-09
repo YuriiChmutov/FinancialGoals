@@ -12,9 +12,13 @@
 
 @if (AccountService.Accounts == null)
 {
-    <p>
-        <em>Loading...</em>
-    </p>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <GridRow Align="middle">
+            <GridCol Span="24" >
+                <Spin/>
+            </GridCol>
+        </GridRow>
+    </div>
 }
 else
 {
@@ -28,34 +32,52 @@ else
             <SegmentedItem Label=@(account.Name) Value=@(account.FinancialAccountId) @key=@account.FinancialAccountId/>
         }
     </Segmented>
+
+    @if (Loading)
+    {
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+            <GridRow Align="middle">
+                <GridCol Span="24" >
+                    <Spin/>
+                </GridCol>
+            </GridRow>
+        </div>
+    }
+    @if (TransactionService.Transactions.Count > 0)
+    {
+        <AntList Class="demo-loadmore-list" 
+                 DataSource="@TransactionService.Transactions" 
+                 ItemLayout="ListItemLayout.Horizontal" 
+                 Loading="@InitLoading"
+                 Style="font-family: EightBitsFont">
+            <ChildContent Context="item">
+                <ListItem Actions="actions">
+                    <ListItemMeta AvatarTemplate="imageFragment(item.CategoryToReturn.Image.ImageBytes, item.CategoryToReturn.Image.ImageName)" Description="@item.Description">
+                        <TitleTemplate>
+                            <a href="https://ant.design">@item.CategoryToReturn.Name</a>
+                        </TitleTemplate>
+                    </ListItemMeta>
+                    <div>
+                        @{
+                            var sign = (item.Type == TransactionType.Income) ? "+" : "-";
+                        }
+                        @sign @item.Amount
+                        @AccountService.Accounts.FirstOrDefault(x => x.FinancialAccountId == AccountService.CurrentAccountId).CurrencyInfo.Currency
+                    </div>
+                </ListItem>
+            </ChildContent>
+        </AntList>
+
+        <Pagination Style="font-family: EightBitsFont" Simple Current="@(TransactionService.CurrentPage)" Total="@(TransactionService.PageCount * 10)" OnChange="HandlePageChange" />
+    }
+    else
+    {
+        <Divider Style="font-family: EightBitsFont">You don't have any transactions yet.</Divider>
+    }
 }
 
-@if (TransactionService.Transactions.Count > 0)
-{
-    <AntList Class="demo-loadmore-list" DataSource="@TransactionService.Transactions" ItemLayout="ListItemLayout.Horizontal" Loading="@InitLoading">
-        <ChildContent Context="item">
-            <ListItem Actions="actions">
-                <ListItemMeta AvatarTemplate="imageFragment(item.CategoryToReturn.Image.ImageBytes, item.CategoryToReturn.Image.ImageName)" Description="@item.Description">
-                    <TitleTemplate>
-                        <a href="https://ant.design">@item.Type</a>
-                    </TitleTemplate>
-                </ListItemMeta>
-                <div>
-                    @{
-                        var sign = (item.Type == TransactionType.Income) ? "+" : "-";
-                    }
-                    <p>@sign @item.Amount</p>
-                </div>
-            </ListItem>
-        </ChildContent>
-    </AntList>
 
-    <Pagination Simple Current="@(TransactionService.CurrentPage)" Total="@(TransactionService.PageCount * 10)" OnChange="HandlePageChange" />
-}
-else
-{
-    <Divider>You don't have any transactions yet.</Divider>
-}
+
 
 @code {
     public bool InitLoading { get; set; } = true;
@@ -98,8 +120,10 @@ else
     
     private async Task OnValueChanged(int value)
     {
+        Loading = true;
         AccountService.CurrentAccountId = value;
         await LoadData(AccountService.CurrentAccountId, TransactionService.CurrentPage);
+        Loading = false;
     }
     
     RenderFragment imageFragment (byte[] imageData, string imageName) => 
