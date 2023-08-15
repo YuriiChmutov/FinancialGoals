@@ -11,4 +11,5 @@ public class CategoryToUpdate
     public decimal Limit { get; set; }
     public UploadedFileModel File { get; set; }
     public CategoryWhatWasChanged Changed { get; set; }
+    public string FilePath { get; set; } = string.Empty;
 }

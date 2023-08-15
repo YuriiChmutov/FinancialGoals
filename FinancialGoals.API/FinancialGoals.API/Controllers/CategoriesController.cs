@@ -90,16 +90,17 @@ namespace FinancialGoals.API.Controllers
         }
         
         // PUT: api/Categories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{accountId}/{id}")]
-        public async Task<IActionResult> PutCategory(int accountId, int id, CategoryToUpdate modifiedCategory)
+        public async Task<IActionResult> PutCategory(int accountId, int id, CategoryToUpdate request)
         {
-            if (id != modifiedCategory.CategoryId)
+            if (id != request.CategoryId)
             {
                 return BadRequest();
             }
-
-            var categoryToUpdate = _mapper.Map<Category>(modifiedCategory);
+            
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            request.FilePath = $"user_{userId}/acc_{accountId}";
+            var categoryToUpdate = _mapper.Map<Category>(request);
             categoryToUpdate.FinancialAccountId = accountId;
             
             try
@@ -127,6 +128,7 @@ namespace FinancialGoals.API.Controllers
         public async Task<ActionResult<Category>> PostCategory(CategoryToCreate request, int accountId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            request.FilePath = $"user_{userId}/acc_{accountId}";
             var category = _mapper.Map<Core.Models.Category>(request);
             await _categoryService.AddCategoryForAccountAsync(category, Int32.Parse(userId), accountId);
 

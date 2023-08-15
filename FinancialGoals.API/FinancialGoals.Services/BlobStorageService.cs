@@ -15,11 +15,11 @@ public class BlobStorageService
         _containerName = containerName;
     }
 
-    public async Task<string> UploadImageAsync(IFormFile file, string folderName, string fileName)
+    public async Task<string> UploadImageAsync(IFormFile file, string filePath, string fileName)
     {
         BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
         // todo add validation if file with the same name already exists
-        string imageName = $"{folderName}/{fileName}.png".ToLower().Replace(" ", string.Empty);
+        string imageName = $"{filePath}/{fileName}.png".ToLower().Replace(" ", string.Empty);
         BlobClient blobClient = containerClient.GetBlobClient(imageName);
 
         using (var stream = file.OpenReadStream())
@@ -59,10 +59,10 @@ public class BlobStorageService
         return await blobClient.DeleteIfExistsAsync();
     }
     
-    public async Task<string> RenameImageAsync(string folderName, string currentImageName, string newImageName)
+    public async Task<string> RenameImageAsync(string filePath, string currentImageName, string newImageName)
     {
-        string fullCurrentImageName = $"{folderName}/{currentImageName}.png".ToLower().Replace(" ", string.Empty);
-        string fullNewImageName = $"{folderName}/{newImageName}.png".ToLower().Replace(" ", string.Empty);
+        string fullCurrentImageName = $"{filePath}/{currentImageName}.png".ToLower().Replace(" ", string.Empty);
+        string fullNewImageName = $"{filePath}/{newImageName}.png".ToLower().Replace(" ", string.Empty);
         BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
         BlobClient currentBlobClient = containerClient.GetBlobClient(fullCurrentImageName);
         BlobClient newBlobClient = containerClient.GetBlobClient(fullNewImageName);

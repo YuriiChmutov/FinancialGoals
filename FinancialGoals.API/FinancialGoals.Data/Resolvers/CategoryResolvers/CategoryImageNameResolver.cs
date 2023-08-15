@@ -27,7 +27,7 @@ public class CategoryImageNameResolver :
         if (source.File != null)
         {
             var file = new MemoryFormFile(source.File.Name, source.File.Data);
-            imageName = _blobStorageService.UploadImageAsync(file, "categories", source.Name).Result;
+            imageName = _blobStorageService.UploadImageAsync(file, $"categories/{source.FilePath}", source.Name).Result;
         }
         else
         {
@@ -39,14 +39,14 @@ public class CategoryImageNameResolver :
     public string Resolve(CategoryToUpdate source, Category destination, string destMember, ResolutionContext context)
     {
         var file = new MemoryFormFile(source.File.Name, source.File.Data);
-        if ((!source.Changed.Name && source.Changed.Image) || (source.Changed is {Name: true, Image: true}))
+        if (source.Changed is {Name: false, Image: true} || (source.Changed is {Name: true, Image: true}))
         {
             var oldCategory = _categoryService.GetCategoryAsync(source.CategoryId).Result;
             if (oldCategory.ImageName != DefaultCategoryImageName)
             {
                 var isDeleted = _blobStorageService.DeleteImageAsync(oldCategory.ImageName).Result;
             }
-            var imageName = _blobStorageService.UploadImageAsync(file, "categories", source.Name).Result;
+            var imageName = _blobStorageService.UploadImageAsync(file, $"categories/{source.FilePath}", source.Name).Result;
             return imageName;
         }
 
@@ -54,10 +54,10 @@ public class CategoryImageNameResolver :
         {
             var oldCategory = _categoryService.GetCategoryAsync(source.CategoryId).Result;
             var newImageName = 
-                _blobStorageService.RenameImageAsync("categories", oldCategory.Name, source.Name).Result;
+                _blobStorageService.RenameImageAsync($"categories/{source.FilePath}", oldCategory.Name, source.Name).Result;
             return newImageName;
         }
         
-        return $"categories/{source.Name}.png".ToLower().Replace(" ", string.Empty);;
+        return $"categories/{source.FilePath}/{source.Name}.png".ToLower().Replace(" ", string.Empty);
     }
 }
