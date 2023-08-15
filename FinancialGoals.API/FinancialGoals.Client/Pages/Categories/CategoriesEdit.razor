@@ -19,51 +19,59 @@
 }
 else
 {
-    <div>
-        @categoryModified.CategoryId
-    </div>
-    
-    <Form Model="@categoryModified"
-          LabelColSpan="8"
-          WrapperColSpan="16">
-        <DataAnnotationsValidator/>
-        <FormItem Label="Name" ShowFeedbackOnError="true">
-            <Input @bind-Value="@context.Name"/>
-        </FormItem>
-        <FormItem Label="Limit" ShowFeedbackOnError="true">
-            <AntDesign.InputNumber @bind-Value="@context.Limit" />
-        </FormItem>
-        
-        <Upload Action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                Name="avatar"
-                Class="avatar-uploader"
-                ListType="picture-card"
-                ShowUploadList="false"
-                BeforeUpload="BeforeUpload"
-                OnChange="HandleChange"
-                >
-            @if (!string.IsNullOrWhiteSpace(imageUrl))
-            {
-                <img src="@imageUrl" alt="avatar" style="width: 100%"/>
-            }
-            else
-            {
-                <div>
-                    <Icon Spin="loading" Type="@(loading?"Loading":"plus")" ></Icon>
-                    <div className="ant-upload-text">Upload</div>
+    <div class="container py-5 h-100">
+        <Form Model="@categoryModified">
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                        <label for="name">Category name</label>
+                        <Input id="name" @bind-Value="@context.Name" class="form-control" style="border-radius: 5px"/>
+                        <ValidationMessage For="@(() => context.Name)"/>
+                    </div>
+                    
+                    <div class="form-outline">
+                        <label for="limit">Limit</label>
+                        <AntDesign.InputNumber @bind-Value="@context.Limit"
+                                               Style="font-family: EightBitsFont; 
+                                                            border-radius: 5px;
+                                                             width: auto";/>
+                        <ValidationMessage For="@(() => context.Limit)"/>
+                    </div>
                 </div>
-            }
-        </Upload>
-
-        <Divider Orientation="right">
-            <Button Type="@ButtonType.Primary" HtmlType="submit" @onclick="UpdateItem">
-                Update
-            </Button>
-            <Button Type="@ButtonType.Dashed" @onclick="Close">
-                Cancel
-            </Button>
-        </Divider>
-    </Form>
+            
+            <div class="col-md-6 mb-4" style="text-align: center; margin-top: 3%">
+                    <Upload Action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                            Name="avatar"
+                            Class="avatar-uploader"
+                            ListType="picture-card"
+                            ShowUploadList="false"
+                            BeforeUpload="BeforeUpload"
+                            OnChange="HandleChange">
+                        @if (!string.IsNullOrWhiteSpace(imageUrl))
+                        {
+                            <img src="@imageUrl" alt="avatar" style="width: 100%"/>
+                        }
+                        else
+                        {
+                            <div>
+                                <Icon Spin="loading" Type="@(loading ? "Loading" : "plus")"></Icon>
+                                <div className="ant-upload-text">Upload</div>
+                            </div>
+                        }
+                    </Upload>
+                </div>
+            </div>
+            <Divider Orientation="right">
+                <Button Type="@ButtonType.Primary" HtmlType="submit" @onclick="UpdateItem">
+                    Update
+                </Button>
+                <Button Type="@ButtonType.Dashed" @onclick="Close">
+                    Cancel
+                </Button>
+            </Divider>
+        </Form>
+    </div>
 }
 
 @code {

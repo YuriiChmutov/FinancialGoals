@@ -13,6 +13,8 @@ public class CategoryImageNameResolver :
     private readonly BlobStorageService _blobStorageService;
     private readonly ICategoryService _categoryService;
 
+    private const string DefaultCategoryImageName = "default.png";
+
     public CategoryImageNameResolver(BlobStorageService blobStorageService, ICategoryService categoryService)
     {
         _blobStorageService = blobStorageService;
@@ -21,8 +23,16 @@ public class CategoryImageNameResolver :
 
     public string Resolve(CategoryToCreate source, Category destination, string destMember, ResolutionContext context)
     {
-        var file = new MemoryFormFile(source.File.Name, source.File.Data);
-        var imageName = _blobStorageService.UploadImageAsync(file, "categories", source.Name).Result;
+        var imageName = string.Empty;
+        if (source.File != null)
+        {
+            var file = new MemoryFormFile(source.File.Name, source.File.Data);
+            imageName = _blobStorageService.UploadImageAsync(file, "categories", source.Name).Result;
+        }
+        else
+        {
+            imageName = DefaultCategoryImageName;
+        }
         return imageName;
     }
     
@@ -32,12 +42,15 @@ public class CategoryImageNameResolver :
         if ((!source.Changed.Name && source.Changed.Image) || (source.Changed is {Name: true, Image: true}))
         {
             var oldCategory = _categoryService.GetCategoryAsync(source.CategoryId).Result;
-            var isDeleted = _blobStorageService.DeleteImageAsync(oldCategory.ImageName).Result;
+            if (oldCategory.ImageName != DefaultCategoryImageName)
+            {
+                var isDeleted = _blobStorageService.DeleteImageAsync(oldCategory.ImageName).Result;
+            }
             var imageName = _blobStorageService.UploadImageAsync(file, "categories", source.Name).Result;
             return imageName;
         }
 
-        if (source.Changed.Name && !source.Changed.Image)
+        if (source.Changed is {Name: true, Image: false})
         {
             var oldCategory = _categoryService.GetCategoryAsync(source.CategoryId).Result;
             var newImageName = 

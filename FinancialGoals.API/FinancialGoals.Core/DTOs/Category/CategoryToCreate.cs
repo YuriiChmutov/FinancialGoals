@@ -9,6 +9,5 @@ public class CategoryToCreate
     public string Name { get; set; }
     [Range(0, Double.MaxValue, ErrorMessage = "The {0} field must be greater than or equal to {1}.")]
     public decimal Limit { get; set; } = 0;
-    [Required]
-    public UploadedFileModel File { get; set; }
+    public UploadedFileModel? File { get; set; }
 }
