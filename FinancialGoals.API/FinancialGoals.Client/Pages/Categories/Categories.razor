@@ -10,11 +10,6 @@
 @using ModalOptions = Blazored.Modal.ModalOptions
 @implements IDisposable
 
-@if (!string.IsNullOrWhiteSpace(alertMessage))
-{
-    <Alert Type="@AlertType.Success" Message="@alertMessage" Closable Style="font-family: EightBitsFont"/>
-}
-
 <PageTitle>Categories</PageTitle>
 <GridRow Style="font-family: EightBitsFont">
     <GridCol Span="12">
@@ -22,6 +17,10 @@
     </GridCol>
 </GridRow>
 
+@if (!string.IsNullOrWhiteSpace(alertMessage))
+{
+    <Alert Type="@AlertType.Success" Message="@alertMessage" Closable Style="font-family: EightBitsFont;"/>
+}
 
 @if (CategoryService.Categories == null)
 {
@@ -37,60 +36,66 @@ else
 {
     @foreach (var account in AccountService.Accounts)
     {
-        <Divider Style="font-family: EightBitsFont">
-            <GridRow>
-                    @account.Name (@account.FinancialAccountId)
-            </GridRow>
-        </Divider>
-        
-        <GridRow>
-            @foreach (var category in CategoryService.Categories)
-            {
-                if (category.FinancialAccountId == account.FinancialAccountId)
+        <Collapse Accordion="true" Bordered="false" Style="font-family: EightBitsFont; text-align: center">
+            
+            <Panel Header="@account.Name" Active="true" Style="background-color: #7fffd4">
+            
+            <GridRow Gutter="@gutter">
+                @foreach (var category in CategoryService.Categories)
                 {
-                    <GridCol Span="6">
-                        <Card Class="mb-3"
-                              Style=@GetCardStyle(category.Default)
-                              Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
-                              Title=@category.Name
-                              Actions="@(new[] 
-                                       {
-                                           actionEdit(!category.Default ? () => OpenEditForm(category.CategoryId, account.FinancialAccountId) : () => ShowAlertWindow("edit")), 
-                                           actionDelete(!category.Default ? () => OpenDeleteForm(category.CategoryId, category.Name) : () => ShowAlertWindow("delete"))
-                                       })">
-                            <Extra>
-                                @cardTitleArrow(category.TransactionType)
-                            </Extra>
-                            <Body>
-                            <Divider Orientation="center">
-                                @if (category.Default)
-                                {
-                                    <span>
-                                        @category.Amount
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span>
-                                        @category.Amount / @category.Limit
-                                    </span>
-                                }
-                            </Divider>
-                            </Body>
-                        </Card>
-                    </GridCol>
+                    if (category.FinancialAccountId == account.FinancialAccountId)
+                    {
+                        <GridCol Class="gutter-row" Span="6">
+                            <Card Class="mb-3"
+                                  Style=@GetCardStyle(category.Default)
+                                  Bordered Cover="coverTemplate(category.Image.ImageBytes, category.Image.ImageName)"
+                                  Title=@category.Name
+                                  Actions="@(new[] 
+                                           {
+                                               actionEdit(!category.Default ? () => OpenEditForm(category.CategoryId, account.FinancialAccountId) : () => ShowAlertWindow("edit")), 
+                                               actionDelete(!category.Default ? () => OpenDeleteForm(category.CategoryId, category.Name) : () => ShowAlertWindow("delete"))
+                                           })">
+                                <Extra>
+                                    @cardTitleArrow(category.TransactionType)
+                                </Extra>
+                                <Body>
+                                <Divider Orientation="center">
+                                    @if (category.Default)
+                                    {
+                                        <span>
+                                            @category.Amount
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            @category.Amount / @category.Limit
+                                        </span>
+                                    }
+                                </Divider>
+                                </Body>
+                            </Card>
+                        </GridCol>
+                    }
                 }
-            }
-            <GridCol Span="6">
-                <Card Style="width: 300px; height: 95%; border-color: #FFD700; border-width: thick; border-radius: 5px; font-family: EightBitsFont">
-                    <div style="text-align: center; margin-top: 50%">
-                        <Button @onclick="@(() => OpenCreateForm(account.FinancialAccountId))">Add</Button>
-                    </div>
-                </Card>
-            </GridCol>
-        </GridRow>
+                <GridCol Span="6">
+                    <Card Style="width: 300px; height: 95%; margin: auto; border-color: #FFD700; border-width: thick; border-radius: 5px; font-family: EightBitsFont">
+                        <div style="text-align: center; margin-top: 50%">
+                            <Button @onclick="@(() => OpenCreateForm(account.FinancialAccountId))">Add</Button>
+                        </div>
+                    </Card>
+                </GridCol>
+            </GridRow>
+            </Panel>
+        </Collapse>
     }
 }
+
+<style>
+    .ant-collapse-content-box {
+        background-color: #7fffd4;
+    }
+</style>
 
 @code {
     private Stream imageStream;
@@ -100,7 +105,24 @@ else
     private bool canBeDeleted = true;
 
     private string backgroundColorForCard(bool isDefault) => !isDefault ? "00ffff" : "#B0E0E6";
-    private string GetCardStyle(bool isDefault) => $"width: 300px; background-color: {backgroundColorForCard(isDefault)}; font-family: EightBitsFont; border-color: #FFD700; border-width: thick; border-radius: 5px;";
+    private string GetCardStyle(bool isDefault) => $"width: 300px; background-color: {backgroundColorForCard(isDefault)}; font-family: EightBitsFont; border-color: #FFD700; border-width: thick; border-radius: 5px; margin: auto;";
+    
+    private bool isListOpen = false;
+    
+    Dictionary<string, int> gutter = new()
+    {
+        ["xs"] = 8,
+        ["sm"] = 16,
+        ["md"] = 24,
+        ["lg"] = 32,
+        ["xl"] = 48,
+        ["xxl"] = 64
+    };
+
+    private void ToggleCollapse()
+    {
+        isListOpen = !isListOpen;
+    }
     
     protected override async Task OnInitializedAsync()
     {
