@@ -8,6 +8,8 @@ public class BlobStorageService
 {
     private readonly BlobServiceClient _blobServiceClient;
     private readonly string _containerName;
+    
+    private const string DefaultCategoryImageName = "default.png";
 
     public BlobStorageService(BlobServiceClient blobServiceClient, string containerName)
     {
@@ -40,7 +42,7 @@ public class BlobStorageService
 
         if (!await blobClient.ExistsAsync())
         {
-            blobClient = containerClient.GetBlobClient("default.png");
+            blobClient = containerClient.GetBlobClient(DefaultCategoryImageName);
         }
 
         var response = await blobClient.DownloadAsync();

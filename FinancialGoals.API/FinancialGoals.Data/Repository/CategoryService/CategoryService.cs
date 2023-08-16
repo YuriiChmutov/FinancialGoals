@@ -12,6 +12,8 @@ public class CategoryService : ICategoryService
     private readonly FinancialDbContext _context;
     private readonly BlobStorageService _blobStorageService;
 
+    private const string DefaultImageName = "default.png";
+
     public CategoryService(FinancialDbContext context, BlobStorageService blobStorageService)
     {
         _context = context ??
@@ -74,7 +76,8 @@ public class CategoryService : ICategoryService
         var category = await _context.Categories.FindAsync(id);
         if (!category.Default)
         {
-            await _blobStorageService.DeleteImageAsync(category.ImageName);
+            if (category.ImageName != DefaultImageName)
+                await _blobStorageService.DeleteImageAsync(category.ImageName);
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
         }
