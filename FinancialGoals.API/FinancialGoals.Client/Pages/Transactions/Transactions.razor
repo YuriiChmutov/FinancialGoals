@@ -51,7 +51,10 @@ else
                  Loading="@InitLoading"
                  Style="font-family: EightBitsFont">
             <ChildContent Context="item">
-                <ListItem Actions="actions">
+                <ListItem Actions="@(new[]{
+                                       edit,
+                                       more(() => OpenDetailsForm(item))
+                                   })">
                     <ListItemMeta AvatarTemplate="imageFragment(item.CategoryToReturn.Image.ImageBytes, item.CategoryToReturn.Image.ImageName)" Description="@item.Description">
                         <TitleTemplate>
                             <a href="https://ant.design">@item.CategoryToReturn.Name</a>
@@ -62,7 +65,7 @@ else
                             var sign = (item.Type == TransactionType.Income) ? "+" : "-";
                         }
                         @sign @item.Amount
-                        @AccountService.Accounts.FirstOrDefault(x => x.FinancialAccountId == AccountService.CurrentAccountId).CurrencyInfo.Currency
+                        @AccountService.Accounts.FirstOrDefault(x => x.FinancialAccountId == AccountService.CurrentAccountId)?.CurrencyInfo.Currency
                     </div>
                 </ListItem>
             </ChildContent>
@@ -82,13 +85,12 @@ else
 @code {
     public bool InitLoading { get; set; } = true;
     public bool Loading { get; set; } = false;
-    public RenderFragment[] actions = new[] { edit, add };
 
     private Dictionary<int, List<TransactionToReturn>> transactionsForAccounts = new Dictionary<int, List<TransactionToReturn>>(); 
 
     static RenderFragment avatar =@<Avatar Src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"></Avatar>;
     static RenderFragment edit = @<a key="list-loadmore-edit">edit</a>;
-    static RenderFragment add = @<a key="list-loadmore-more">more</a>;
+    RenderFragment more(Action clickAction) => @<a key="list-loadmore-more" onclick="@clickAction">more</a>;
     
     protected override async Task OnInitializedAsync()
     {
@@ -133,5 +135,12 @@ else
     {
         string base64Image = Convert.ToBase64String(imageData);
         return $"data:image/png;base64,{base64Image}";
+    }
+
+    private void OpenDetailsForm(TransactionToReturn transaction)
+    {
+        var parameters = new ModalParameters()
+            .Add("Transaction", transaction);
+        modal.Show<TransactionDetails>($"Details", parameters);
     }
 }

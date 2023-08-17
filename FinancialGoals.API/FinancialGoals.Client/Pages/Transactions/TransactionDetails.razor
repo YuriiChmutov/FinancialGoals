@@ -1,0 +1,52 @@
+﻿@using FinancialGoals.Core.DTOs.Transaction
+@using FinancialGoals.Services
+@using FinancialGoals.Client.Services.AccountService
+
+@inject IAccountService AccountService
+
+
+<div class="container py-5 h-100">
+    <Divider>@Transaction.Amount</Divider>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <Image Preview="false" Src="@getImageDataFromBytes(Transaction.CategoryToReturn.Image.ImageBytes)"></Image>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div>
+                @Transaction.CategoryToReturn.Name
+            </div>
+            <div>
+                @Transaction.Type
+            </div>
+            <div>
+                @{
+                    var sign = (Transaction.Type == TransactionType.Income) ? "+" : "-";
+                }
+                @sign @Transaction.Amount
+                @AccountService.Accounts.FirstOrDefault(x => x.FinancialAccountId == AccountService.CurrentAccountId)?.CurrencyInfo.Currency
+            </div>
+            <div>
+                @Transaction.Date
+            </div>
+            <div>
+                @Transaction.Description
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public TransactionToReturn Transaction { get; set; }
+
+
+    RenderFragment imageFragment(byte[] imageData, string imageName) =>
+        @<img Style="width: 50px; margin: auto" alt="@imageName" src="@getImageDataFromBytes(imageData)" />;
+
+    private string getImageDataFromBytes(byte[] imageData)
+    {
+        string base64Image = Convert.ToBase64String(imageData);
+        return $"data:image/png;base64,{base64Image}";
+    }
+}
