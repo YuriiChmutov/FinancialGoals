@@ -66,5 +66,15 @@ namespace FinancialGoals.API.Controllers
             var transactionToReturn = _mapper.Map<Transaction>(transaction);
             return Ok(transactionToReturn);
         }
+
+        [HttpPut("{accountId}/{id}")]
+        public async Task<ActionResult> PutTransaction(int accountId, int id, TransactionToUpdate request)
+        {
+            var transactionToUpdate = _mapper.Map<Transaction>(request);
+
+            await _transactionService.UpdateTransactionAsync(id, transactionToUpdate);
+
+            return Ok();
+        }
     }
 }

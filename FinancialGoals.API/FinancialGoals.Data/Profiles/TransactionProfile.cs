@@ -17,5 +17,11 @@ public class TransactionProfile : Profile
 
         CreateMap<TransactionToReturn, TransactionsDataDTO>()
             .ForMember(dest => dest.Transactions, opt => opt.MapFrom(x => x));
+
+        CreateMap<TransactionToUpdate, Transaction>()
+            .ForMember(dest => dest.Category, opt => opt.Ignore())
+            .ForMember(dest => dest.Date, opt => opt.Ignore())
+            .ForMember(dest => dest.FinancialAccountId, opt => opt.Ignore())
+            .ForMember(dest => dest.FinancialAccount, opt => opt.Ignore());
     }
 }

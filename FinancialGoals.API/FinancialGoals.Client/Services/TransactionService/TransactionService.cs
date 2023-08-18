@@ -63,4 +63,10 @@ public class TransactionService : ITransactionService
         var response = await _http.PostAsJsonAsync($"https://localhost:7128/api/Transactions", transaction);
         return response.StatusCode == HttpStatusCode.OK ? true : false;
     }
+
+    public async Task<bool> UpdateTransaction(TransactionToUpdate transaction)
+    {
+        var response = await _http.PutAsJsonAsync($"https://localhost:7128/api/Transactions/{_accountService.CurrentAccountId}/{transaction.TransactionId}", transaction);
+        return response.StatusCode == HttpStatusCode.OK ? true : false;
+    }
 }

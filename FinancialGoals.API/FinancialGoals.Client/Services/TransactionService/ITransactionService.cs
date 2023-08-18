@@ -14,4 +14,5 @@ public interface ITransactionService
     Task GetTransactionsForAccount(int accountId, int page);
     Task<TransactionToReturn> GetTransaction(int transactionId);
     Task<bool> AddTransaction(TransactionToCreate transaction);
+    Task<bool> UpdateTransaction(TransactionToUpdate transaction);
 }

@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialGoals.API", "FinancialGoals.API\FinancialGoals.API.csproj", "{93837544-642E-43F4-A727-AA7F87EBEE8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinancialGoals.API", "FinancialGoals.API\FinancialGoals.API.csproj", "{93837544-642E-43F4-A727-AA7F87EBEE8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialGoals.Core", "FinancialGoals.Core\FinancialGoals.Core.csproj", "{CFAF06E6-9C93-4DCD-BD90-BFE129D99127}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinancialGoals.Core", "FinancialGoals.Core\FinancialGoals.Core.csproj", "{CFAF06E6-9C93-4DCD-BD90-BFE129D99127}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialGoals.Data", "FinancialGoals.Data\FinancialGoals.Data.csproj", "{B561BE0C-659E-44B2-8392-3E03871C8ED3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinancialGoals.Data", "FinancialGoals.Data\FinancialGoals.Data.csproj", "{B561BE0C-659E-44B2-8392-3E03871C8ED3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialGoals.Services", "FinancialGoals.Services\FinancialGoals.Services.csproj", "{C5CC8575-7F82-4040-BCA3-83CEA1B8EDC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinancialGoals.Services", "FinancialGoals.Services\FinancialGoals.Services.csproj", "{C5CC8575-7F82-4040-BCA3-83CEA1B8EDC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialGoals.Client", "FinancialGoals.Client\FinancialGoals.Client.csproj", "{31345924-E646-49B0-820E-5157BD4E8E63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinancialGoals.Client", "FinancialGoals.Client\FinancialGoals.Client.csproj", "{31345924-E646-49B0-820E-5157BD4E8E63}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

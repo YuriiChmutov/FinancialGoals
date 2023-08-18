@@ -3,7 +3,7 @@
 @using FinancialGoals.Client.Services.AccountService
 
 @inject IAccountService AccountService
-
+@inject ITransactionService TransactionService
 
 <div class="container py-5 h-100">
     <Divider>@Transaction.Amount</Divider>
@@ -12,25 +12,32 @@
             <Image Preview="false" Src="@getImageDataFromBytes(Transaction.CategoryToReturn.Image.ImageBytes)"></Image>
         </div>
         <div class="col-md-6 mb-4">
-            <div>
-                @Transaction.CategoryToReturn.Name
-            </div>
-            <div>
-                @Transaction.Type
-            </div>
-            <div>
-                @{
-                    var sign = (Transaction.Type == TransactionType.Income) ? "+" : "-";
-                }
-                @sign @Transaction.Amount
-                @AccountService.Accounts.FirstOrDefault(x => x.FinancialAccountId == AccountService.CurrentAccountId)?.CurrencyInfo.Currency
-            </div>
-            <div>
-                @Transaction.Date
-            </div>
-            <div>
-                @Transaction.Description
-            </div>
+            @if (Transaction.Editing)
+            {
+
+            }
+            else
+            {
+                <div>
+                    @Transaction.CategoryToReturn.Name
+                </div>
+                <div>
+                    @Transaction.Type
+                </div>
+                <div>
+                    @{
+                        var sign = (Transaction.Type == TransactionType.Income) ? "+" : "-";
+                    }
+                    @sign @Transaction.Amount
+                    @AccountService.Accounts.FirstOrDefault(x => x.FinancialAccountId == AccountService.CurrentAccountId)?.CurrencyInfo.Currency
+                </div>
+                <div>
+                    @Transaction.Date
+                </div>
+                <div>
+                    @Transaction.Description
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -40,6 +47,12 @@
     [Parameter]
     public TransactionToReturn Transaction { get; set; }
 
+    TransactionToUpdate TransactionToUpdate { get; set; } = new TransactionToUpdate();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
 
     RenderFragment imageFragment(byte[] imageData, string imageName) =>
         @<img Style="width: 50px; margin: auto" alt="@imageName" src="@getImageDataFromBytes(imageData)" />;
@@ -48,5 +61,25 @@
     {
         string base64Image = Convert.ToBase64String(imageData);
         return $"data:image/png;base64,{base64Image}";
+    }
+
+    private void EditTransaction(TransactionToReturn transaction)
+    {
+        transaction.Editing = true;
+
+        TransactionToUpdate.Description = transaction.Description;
+        TransactionToUpdate.Amount = transaction.Amount;
+        TransactionToUpdate.Type = transaction.Type; // todo: make dropdown
+        TransactionToUpdate.CategoryId = transaction.CategoryId; // todo: make dropdown
+    }
+
+    private async Task UpdateTransaction()
+    {
+        await TransactionService.UpdateTransaction(TransactionToUpdate);
+    }
+
+    private async Task CancelEditing()
+    {
+        TransactionToUpdate = new TransactionToUpdate();
     }
 }

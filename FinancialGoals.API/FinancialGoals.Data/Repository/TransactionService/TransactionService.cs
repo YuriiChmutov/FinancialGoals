@@ -107,8 +107,19 @@ public class TransactionService : ITransactionService
 
     public async Task UpdateTransactionAsync(int id, Transaction transaction)
     {
-        _context.Entry(transaction).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        var transactionFromDb = await _context.Transactions.FindAsync(id);
+
+        if (transactionFromDb != null)
+        {
+            transactionFromDb.Amount = transaction.Amount;
+            transactionFromDb.CategoryId = transaction.CategoryId;
+            transactionFromDb.Description = transaction.Description;
+            transactionFromDb.Type = transaction.Type;
+
+            //_context.Entry(transaction).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task DeleteTransactionAsync(int id)

@@ -14,4 +14,5 @@ public class TransactionToReturn
     public int FinancialAccountId { get; set; }
     public CategoryToReturn CategoryToReturn { get; set; } = new CategoryToReturn();
     public int CategoryId { get; set; }
+    public bool Editing { get; set; } = false;
 }

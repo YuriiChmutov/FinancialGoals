@@ -8,7 +8,7 @@ namespace FinancialGoals.Core.Models
         public double Amount { get; set; }
         public TransactionType Type { get; set; }
         public DateTime Date { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public FinancialAccount FinancialAccount { get; set; }
         public int FinancialAccountId { get; set; }
         public Category Category { get; set; }
