@@ -165,7 +165,7 @@ else
         var message = modal.Show<CategoriesAdd>("Create category", parameters);
         var result = await message.Result;
 
-        if (result.Confirmed && result.Data != null)
+        if (result is {Confirmed: true,Data: not null})
         {
             alertMessage = result.Data.ToString();
             StateHasChanged();

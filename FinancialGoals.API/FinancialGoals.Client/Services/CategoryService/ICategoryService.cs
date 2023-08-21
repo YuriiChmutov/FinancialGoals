@@ -8,6 +8,7 @@ public interface ICategoryService
     event Action OnChange;
     List<CategoryToReturn> Categories { get; set; }
     Task GetCategories();
+    Task<List<CategoryToReturn>> GetCategoriesForDropdown(int accountId);
     Task<CategoryToReturn> GetCategory(int categoryId);
     Task<bool> AddCategory(CategoryToCreate category, int accountId);
     CategoryToCreate CreateNewCategory();

@@ -1,7 +1,6 @@
-﻿using System.Net;
+﻿using FinancialGoals.Core.DTOs.Category;
+using System.Net;
 using System.Net.Http.Json;
-using FinancialGoals.Core.DTOs;
-using FinancialGoals.Core.DTOs.Category;
 
 namespace FinancialGoals.Client.CategoryService;
 
@@ -20,6 +19,11 @@ public class CategoryService : ICategoryService
     public async Task GetCategories()
     {
         Categories = await _http.GetFromJsonAsync<List<CategoryToReturn>>("https://localhost:7128/api/Categories");
+    }
+
+    public async Task<List<CategoryToReturn>> GetCategoriesForDropdown(int accountId)
+    {
+        return await _http.GetFromJsonAsync<List<CategoryToReturn>>($"https://localhost:7128/api/Categories/categories-for-account/{accountId}");
     }
 
     public Task<CategoryToReturn> GetCategory(int categoryId)
