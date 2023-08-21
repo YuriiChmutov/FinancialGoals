@@ -1,63 +1,113 @@
 ﻿@using FinancialGoals.Core.DTOs.Transaction
 @using FinancialGoals.Services
 @using FinancialGoals.Client.Services.AccountService
+@using FinancialGoals.Core.DTOs.Category
+@using AutoMapper
 
 @inject IAccountService AccountService
 @inject ITransactionService TransactionService
+@inject ICategoryService CategoryService
+@inject IMapper Mapper
 
 <div class="container py-5 h-100">
-    <Divider>@Transaction.Amount</Divider>
     <div class="row">
         <div class="col-md-6 mb-4">
-            <Image Preview="false" Src="@getImageDataFromBytes(Transaction.CategoryToReturn.Image.ImageBytes)"></Image>
+            <Image Preview="false" Src="@_imageSrc"></Image>
         </div>
         <div class="col-md-6 mb-4">
             @if (Transaction.Editing)
             {
-
+                <EditForm Model="TransactionToUpdate" OnSubmit="UpdateTransaction">
+                    <GridRow Justify="end" Class="mb-2">
+                        <div>
+                            <button class="btn btn-success" @onclick="UpdateTransaction">
+                                <i class="oi oi-file"></i>
+                            </button>
+                            <button class="btn btn-danger" @onclick="CancelEditing">
+                                <i class="oi oi-x"></i>
+                            </button>
+                        </div>
+                    </GridRow>
+                    <GridRow>
+                        <GridCol>
+                            <div class="mb-2">
+                                <SimpleSelect Style="width:200px;"
+                                              OnSelectedItemChanged="HandleCategoryChange" DefaultValue="@Transaction.CategoryToReturn.CategoryId.ToString()">
+                                    <SelectOptions>
+                                        @foreach (var category in _categories)
+                                        {
+                                            <SimpleSelectOption Style="font-family: EightBitsFont;" Value="@category.CategoryId.ToString()" Label="@category.Name"></SimpleSelectOption>
+                                        }
+                                    </SelectOptions>
+                                </SimpleSelect>
+                            </div>
+                            <div class="mb-2">
+                                <AntDesign.InputNumber Style="width: 100%" Min="0" @bind-Value="TransactionToUpdate.Amount"/>
+                            </div>
+                            <div class="mb-2">
+                                @Transaction.Date
+                            </div>
+                            <div>
+                                <TextArea @bind-Value="TransactionToUpdate.Description"/>
+                            </div>
+                        </GridCol>
+                    </GridRow>
+                </EditForm>
             }
             else
             {
-                <div>
-                    @Transaction.CategoryToReturn.Name
-                </div>
-                <div>
-                    @Transaction.Type
-                </div>
-                <div>
-                    @{
-                        var sign = (Transaction.Type == TransactionType.Income) ? "+" : "-";
-                    }
-                    @sign @Transaction.Amount
-                    @AccountService.Accounts.FirstOrDefault(x => x.FinancialAccountId == AccountService.CurrentAccountId)?.CurrencyInfo.Currency
-                </div>
-                <div>
-                    @Transaction.Date
-                </div>
-                <div>
-                    @Transaction.Description
-                </div>
+                <GridRow Justify="end" Class="">
+                    <div>
+                        <button class="btn btn-primary" @onclick="(() => EditTransaction(Transaction))">
+                            <i class="oi oi-pencil"></i>
+                        </button>
+                    </div>
+                </GridRow>
+                <GridRow>
+                    <GridCol>
+                        <div class="" >
+                            <div class="m-3">
+                                @Transaction.CategoryToReturn.Name
+                            </div>
+                            <div class="m-3">
+                                @{
+                                    var sign = (Transaction.Type == TransactionType.Income) ? "+" : "-";
+                                }
+                                @sign @Transaction.Amount
+                                @AccountService.Accounts.FirstOrDefault(x => x.FinancialAccountId == AccountService.CurrentAccountId)?.CurrencyInfo.Currency
+                            </div>
+                            <div class="m-3">
+                                @Transaction.Date
+                            </div>
+                            <div class="m-3">
+                                @Transaction.Description
+                            </div>
+                        </div>
+                    </GridCol>
+                </GridRow>
             }
         </div>
     </div>
 </div>
-
 
 @code {
     [Parameter]
     public TransactionToReturn Transaction { get; set; }
 
     TransactionToUpdate TransactionToUpdate { get; set; } = new TransactionToUpdate();
+    List<CategoryToReturn> _categories = new List<CategoryToReturn>();
+    string _imageSrc = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        
+        _imageSrc = GetImageDataFromBytes(Transaction.CategoryToReturn.Image.ImageBytes);
+        _categories = await CategoryService.GetCategoriesForDropdown(AccountService.CurrentAccountId);
     }
 
-    RenderFragment imageFragment(byte[] imageData, string imageName) =>
-        @<img Style="width: 50px; margin: auto" alt="@imageName" src="@getImageDataFromBytes(imageData)" />;
+    RenderFragment ImageFragment(byte[] imageData, string imageName) =>
+        @<img Style="width: 50px; margin: auto" alt="@imageName" src="@GetImageDataFromBytes(imageData)" />;
 
-    private string getImageDataFromBytes(byte[] imageData)
+    private string GetImageDataFromBytes(byte[] imageData)
     {
         string base64Image = Convert.ToBase64String(imageData);
         return $"data:image/png;base64,{base64Image}";
@@ -67,19 +117,47 @@
     {
         transaction.Editing = true;
 
+        TransactionToUpdate.TransactionId = Transaction.TransactionId;
         TransactionToUpdate.Description = transaction.Description;
         TransactionToUpdate.Amount = transaction.Amount;
-        TransactionToUpdate.Type = transaction.Type; // todo: make dropdown
-        TransactionToUpdate.CategoryId = transaction.CategoryId; // todo: make dropdown
+        TransactionToUpdate.Type = transaction.Type;
+        TransactionToUpdate.CategoryId = transaction.CategoryId;
     }
 
     private async Task UpdateTransaction()
     {
-        await TransactionService.UpdateTransaction(TransactionToUpdate);
+        var result = await TransactionService.UpdateTransaction(TransactionToUpdate);
+        if (result)
+        {
+            Transaction.Editing = false;
+            var updatedTransaction = await TransactionService.GetTransaction(TransactionToUpdate.TransactionId);
+
+            Transaction.Description = updatedTransaction.Description;
+            Transaction.CategoryId = updatedTransaction.CategoryId;
+            Transaction.CategoryToReturn = updatedTransaction.CategoryToReturn;
+            Transaction.Amount = updatedTransaction.Amount;
+            Transaction.Type = updatedTransaction.CategoryToReturn.TransactionType;
+
+            StateHasChanged();
+        }
     }
 
     private async Task CancelEditing()
     {
+        Transaction.Editing = false;
         TransactionToUpdate = new TransactionToUpdate();
+
+        _imageSrc = GetImageDataFromBytes(Transaction.CategoryToReturn.Image.ImageBytes);
+    }
+
+    void HandleCategoryChange(string value)
+    {
+        if (int.TryParse(value, out int categoryId))
+        {
+            TransactionToUpdate.CategoryId = categoryId;
+            var selectedCategory = _categories.FirstOrDefault(x => x.CategoryId == categoryId);
+            _imageSrc = GetImageDataFromBytes(selectedCategory!.Image.ImageBytes);
+            TransactionToUpdate.Type = selectedCategory.TransactionType;
+        }
     }
 }

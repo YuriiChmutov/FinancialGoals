@@ -52,12 +52,12 @@ else
                  Style="font-family: EightBitsFont">
             <ChildContent Context="item">
                 <ListItem Actions="@(new[]{
-                                       edit,
-                                       more(() => OpenDetailsForm(item))
+                                       more(() => OpenDetailsForm(item)),
+                                       delete(async() => await OpenDeleteForm(item.TransactionId))
                                    })">
                     <ListItemMeta AvatarTemplate="imageFragment(item.CategoryToReturn.Image.ImageBytes, item.CategoryToReturn.Image.ImageName)" Description="@item.Description">
                         <TitleTemplate>
-                            <a href="https://ant.design">@item.CategoryToReturn.Name</a>
+                            <a>@item.CategoryToReturn.Name</a>
                         </TitleTemplate>
                     </ListItemMeta>
                     <div>
@@ -79,9 +79,6 @@ else
     }
 }
 
-
-
-
 @code {
     public bool InitLoading { get; set; } = true;
     public bool Loading { get; set; } = false;
@@ -89,8 +86,8 @@ else
     private Dictionary<int, List<TransactionToReturn>> transactionsForAccounts = new Dictionary<int, List<TransactionToReturn>>(); 
 
     static RenderFragment avatar =@<Avatar Src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"></Avatar>;
-    static RenderFragment edit = @<a key="list-loadmore-edit">edit</a>;
     RenderFragment more(Action clickAction) => @<a key="list-loadmore-more" onclick="@clickAction">more</a>;
+    RenderFragment delete(Action clickAction) => @<a key="list-loadmore-more" onclick="@clickAction">delete</a>;
     
     protected override async Task OnInitializedAsync()
     {
@@ -137,10 +134,24 @@ else
         return $"data:image/png;base64,{base64Image}";
     }
 
-    private void OpenDetailsForm(TransactionToReturn transaction)
+    private async Task OpenDetailsForm(TransactionToReturn transaction)
     {
         var parameters = new ModalParameters()
             .Add("Transaction", transaction);
-        modal.Show<TransactionDetails>($"Details", parameters);
+        var response = modal.Show<TransactionDetails>($"Details", parameters);
+
+        var result = await response.Result;
+
+        StateHasChanged();
+    }
+
+    private async Task OpenDeleteForm(int transactionId)
+    {
+        var parameters = new ModalParameters()
+            .Add("TransactionId", transactionId);
+        modal.Show<TransactionDelete>("Are you sure that you want to delete transaction?", parameters);
+
+        await LoadData(AccountService.CurrentAccountId, TransactionService.CurrentPage);
+        TransactionService.OnChange += StateHasChanged;
     }
 }

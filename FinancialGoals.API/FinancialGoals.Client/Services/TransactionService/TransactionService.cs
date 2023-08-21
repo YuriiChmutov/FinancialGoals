@@ -53,9 +53,13 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public Task<TransactionToReturn> GetTransaction(int transactionId)
+    public async Task<TransactionToReturn> GetTransaction(int transactionId)
     {
-        throw new NotImplementedException();
+        var response =
+            await _http.GetFromJsonAsync<TransactionToReturn>(
+                $"https://localhost:7128/api/Transactions/{transactionId}");
+
+        return response!;
     }
 
     public async Task<bool> AddTransaction(TransactionToCreate transaction)
@@ -68,5 +72,10 @@ public class TransactionService : ITransactionService
     {
         var response = await _http.PutAsJsonAsync($"https://localhost:7128/api/Transactions/{_accountService.CurrentAccountId}/{transaction.TransactionId}", transaction);
         return response.StatusCode == HttpStatusCode.OK ? true : false;
+    }
+
+    public async Task DeleteTransaction(int transactionId)
+    {
+        await _http.DeleteAsync($"https://localhost:7128/api/Transactions/{transactionId}");
     }
 }

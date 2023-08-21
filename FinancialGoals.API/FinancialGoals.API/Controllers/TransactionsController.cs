@@ -76,5 +76,13 @@ namespace FinancialGoals.API.Controllers
 
             return Ok();
         }
+
+        // DELETE: api/Transactions/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTransaction(int id)
+        {
+            await _transactionService.DeleteTransactionAsync(id);
+            return NoContent();
+        }
     }
 }

@@ -1,0 +1,25 @@
+﻿@using FinancialGoals.Client.Services.AccountService
+@inject HttpClient Http
+@inject ITransactionService TransactionService
+@inject IAccountService AccountService
+
+<Divider Orientation="right">
+    <Button Danger Type="@ButtonType.Primary" HtmlType="submit" @onclick="Delete">
+         Ok
+     </Button>
+     <Button Type="@ButtonType.Dashed" @onclick="Close">
+         Cancel
+     </Button>
+ </Divider>
+
+ @code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter] public int TransactionId { get; set; }
+
+    private async Task Close() => await BlazoredModal.CloseAsync();
+    private async Task Delete()
+    {
+        await TransactionService.DeleteTransaction(TransactionId);
+        await BlazoredModal.CloseAsync();
+    }
+}

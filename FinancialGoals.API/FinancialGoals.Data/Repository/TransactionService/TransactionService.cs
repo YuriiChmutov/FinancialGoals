@@ -96,7 +96,9 @@ public class TransactionService : ITransactionService
 
     public async Task<Transaction?> GetTransactionAsync(int id)
     {
-        return await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionId == id);
+        return await _context.Transactions
+            .Include(t => t.Category)
+            .FirstOrDefaultAsync(t => t.TransactionId == id);
     }
 
     public async Task AddTransactionAsync(Transaction transaction)

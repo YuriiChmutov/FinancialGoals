@@ -15,4 +15,5 @@ public interface ITransactionService
     Task<TransactionToReturn> GetTransaction(int transactionId);
     Task<bool> AddTransaction(TransactionToCreate transaction);
     Task<bool> UpdateTransaction(TransactionToUpdate transaction);
+    Task DeleteTransaction(int transactionId);
 }
