@@ -9,6 +9,7 @@ public interface ITransactionService
     Task<TransactionsDataDTO> GetTransactionsForUserAsync(int userId, int page);
     Task<TransactionsDataDTO> GetTransactionsForUserByAccountAsync(int userId, int accountId, int page);
     Task<List<Transaction>> GetTransactionsByDateAsync(int accountId, DateTime dateStart, DateTime? dateEnd = null);
+    Task<Dictionary<string, double>> GetTransactionsSpendsForEachMonthPerYear(int accountId, int year);
     Task<bool> TransactionExistsAsync(int id);
     Task<Transaction?> GetTransactionAsync(int id);
     Task AddTransactionAsync(Transaction transaction);

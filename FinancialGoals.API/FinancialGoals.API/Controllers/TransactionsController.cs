@@ -23,8 +23,8 @@ namespace FinancialGoals.API.Controllers
             _transactionService = transactionService;
             _mapper = mapper;
         }
-        
-        // GET: api/Transactions
+
+        // GET: api/Transactions/user-transactions/1
         [HttpGet("user-transactions/{page}")]
         public async Task<ActionResult<TransactionsDataDTO>> GetTransactions(int page)
         {
@@ -34,7 +34,7 @@ namespace FinancialGoals.API.Controllers
             return Ok(transactionsFromRepo);
         }
 
-        // GET: api/Transactions
+        // GET: api/Transactions/user-transactions/1/1
         [HttpGet("user-transactions/{accountId}/{page}")]
         public async Task<ActionResult<TransactionsDataDTO>> GetTransactions(int accountId, int page)
         {
@@ -42,6 +42,14 @@ namespace FinancialGoals.API.Controllers
             var transactionsFromRepo = await _transactionService.GetTransactionsForUserByAccountAsync(int.Parse(userId), accountId, page);
             
             return Ok(transactionsFromRepo);
+        }
+
+        [HttpGet("account-transactions/{accountId}/{year}")]
+        public async Task<ActionResult<Dictionary<string, double>>> GetTransactionsSpendsForEachMonthPerYear(int accountId, int year)
+        {
+            var data = 
+                await _transactionService.GetTransactionsSpendsForEachMonthPerYear(accountId, year);
+            return Ok(data);
         }
 
         // GET: api/Transactions/5

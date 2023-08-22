@@ -12,6 +12,7 @@ public interface ITransactionService
 
     Task GetTransactions(int page);
     Task GetTransactionsForAccount(int accountId, int page);
+    Task<Dictionary<string, double>> GetAllTransactionsForAccount(int accountId, int year);
     Task<TransactionToReturn> GetTransaction(int transactionId);
     Task<bool> AddTransaction(TransactionToCreate transaction);
     Task<bool> UpdateTransaction(TransactionToUpdate transaction);

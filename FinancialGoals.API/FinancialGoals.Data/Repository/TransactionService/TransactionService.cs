@@ -2,7 +2,9 @@
 using FinancialGoals.Core.DTOs.Transaction;
 using FinancialGoals.Core.Models;
 using FinancialGoals.Data.Data;
+using FinancialGoals.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace FinancialGoals.Data.Repository.TransactionService;
 
@@ -77,6 +79,35 @@ public class TransactionService : ITransactionService
             .Where(t => t.FinancialAccountId == accountId &&
                         t.Date >= dateStart && t.Date <= dateEnd
             ).ToListAsync();
+    }
+
+    public async Task<Dictionary<string, double>> GetTransactionsSpendsForEachMonthPerYear(int accountId, int year)
+    {
+        var monthlyExpenses =
+            await _context.Transactions
+                .Where(x => x.FinancialAccountId == accountId &&
+                            x.Type == TransactionType.Expense &&
+                            x.Date.Year == year)
+                .GroupBy(x => x.Date.Month)
+                .Select(group => new
+                {
+                    Month = group.Key,
+                    TotalAmount = group.Sum(x => x.Amount)
+                })
+                .ToListAsync();
+
+        var result = new Dictionary<string, double>();
+        var cultureInfo = new CultureInfo("en-US");
+
+        for (int month = 1; month <= 12; month++)
+        {
+            //var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
+            var monthName = cultureInfo.DateTimeFormat.GetAbbreviatedMonthName(month);
+            var expensesForMonth = monthlyExpenses.FirstOrDefault(x => x.Month == month);
+            result.Add(monthName, expensesForMonth?.TotalAmount ?? 0);
+        }
+
+        return result;
     }
 
     public decimal GetSpendAmountByCategory(int categoryId)

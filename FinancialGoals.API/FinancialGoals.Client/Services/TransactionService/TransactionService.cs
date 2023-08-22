@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using Azure;
 using FinancialGoals.Client.Services.AccountService;
 using FinancialGoals.Core.DTOs.Transaction;
 
@@ -51,6 +52,12 @@ public class TransactionService : ITransactionService
             CurrentPage = result.CurrentPage;
             PageCount = result.Pages;
         }
+    }
+
+    public async Task<Dictionary<string, double>> GetAllTransactionsForAccount(int accountId, int year)
+    {
+        var result = await _http.GetFromJsonAsync<Dictionary<string, double>>($"https://localhost:7128/api/Transactions/account-transactions/{accountId}/{year}");
+        return result!;
     }
 
     public async Task<TransactionToReturn> GetTransaction(int transactionId)

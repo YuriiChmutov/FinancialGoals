@@ -1,0 +1,68 @@
+﻿@using ChartJs.Blazor.BarChart
+@using FinancialGoals.Core.DTOs.Account
+@using System.Drawing
+@using Color = System.Drawing.Color
+
+@inject ITransactionService TransactionService
+
+<div style="font-family: EightBitsFont;">
+
+    <Chart Config="_config"></Chart>
+</div>
+
+@code {
+    [Parameter]
+    public AccountToReturn Account { get; set; }
+    private BarConfig _config = new BarConfig();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _config.Options = new BarOptions
+        {
+            Responsive = true,
+            Legend = new Legend
+            {
+                Display = false,
+                Position = Position.Bottom
+            },
+            Title = new OptionsTitle
+            {
+                Display = true,
+                Text = "Expenses in 2023"
+            }
+        };
+
+        var monthlyExpenses = await TransactionService.GetAllTransactionsForAccount(Account.FinancialAccountId, 2023);
+        var expenses = new List<double>();
+
+
+        monthlyExpenses.ForEach(x =>
+        {
+            expenses.Add(x.Value);
+            _config.Data.Labels.Add(x.Key);
+        });
+
+        var dataset = CreateRandomColoredBarDataset(expenses);
+
+        _config.Data.Datasets.Add(dataset);
+    }
+
+    private BarDataset<double> CreateRandomColoredBarDataset(List<double> data)
+    {
+        var random = new Random();
+        var backgroundColors = new List<string>();
+
+        for (int i = 0; i < data.Count; i++)
+        {
+            var randomColor = ColorUtil.ColorHexString((byte)random.Next(0, 256), (byte)random.Next(0, 256), (byte)random.Next(0, 256));
+            backgroundColors.Add(randomColor);
+        }
+
+        var dataset = new BarDataset<double>(data)
+        {
+            BackgroundColor = backgroundColors.ToArray()
+        };
+
+        return dataset;
+    }
+}
