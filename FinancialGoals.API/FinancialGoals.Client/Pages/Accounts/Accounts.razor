@@ -1,6 +1,28 @@
 ﻿@page "/Accounts"
-<h3>Accounts</h3>
+@using FinancialGoals.Client.Services.AccountService
 
-@code {
-    
+@inject IAccountService AccountService
+
+@if (AccountService.Accounts != null)
+{
+    <div>
+        <GridRow Style="font-family: EightBitsFont;" Justify="space-around" Align="middle">
+            @foreach (var account in AccountService.Accounts)
+            {
+                <GridCol Class="gutter-row" Span="11" Style="height: 800px;">
+                    <Divider>@account.Name</Divider>
+                    <AccountPieChart Account="@account"/>
+                    <AccountBarChart Account="@account"/>
+                </GridCol>
+            }
+        </GridRow>
+    </div>
+}
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await AccountService.GetAccounts();
+    }
 }

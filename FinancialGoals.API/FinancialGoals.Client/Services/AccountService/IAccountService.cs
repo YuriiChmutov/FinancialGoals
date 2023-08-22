@@ -9,6 +9,4 @@ public interface IAccountService
     List<AccountToReturn> Accounts { get; set; }
     Task GetAccounts();
     Task Clean();
-    // Task<AccountToReturn> GetAccount();
-    // Task<bool> AddAccount();
 }

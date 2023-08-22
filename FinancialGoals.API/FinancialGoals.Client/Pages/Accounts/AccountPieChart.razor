@@ -1,0 +1,60 @@
+﻿@using ChartJs.Blazor.PieChart
+@using FinancialGoals.Core.DTOs.Account
+
+
+<div style="font-family: EightBitsFont;">
+    <Chart Config="_config"></Chart>
+</div>
+
+@code {
+
+    [Parameter]
+    public AccountToReturn Account { get; set; }
+
+    private PieConfig _config = new PieConfig();
+
+    protected override void OnInitialized()
+    {
+        _config.Options = new PieOptions
+            {
+                Responsive = true,
+                Legend = new Legend
+                {
+                    Position = Position.Right
+                },
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "todo: per month should be"
+                }
+            };
+
+        var dataset = CreateRandomColoredPieDataset(Account.Categories.Select(c => (int)c.Amount).ToList());
+
+        foreach (var categoryName in Account.Categories.Where(c => c.Amount > 0).Select(c => c.Name))
+        {
+            _config.Data.Labels.Add(categoryName);
+        }
+
+        _config.Data.Datasets.Add(dataset);
+    }
+
+    private PieDataset<int> CreateRandomColoredPieDataset(List<int> data)
+    {
+        var random = new Random();
+        var backgroundColors = new List<string>();
+
+        for (int i = 0; i < data.Count; i++)
+        {
+            var randomColor = ColorUtil.ColorHexString((byte)random.Next(0, 256), (byte)random.Next(0, 256), (byte)random.Next(0, 256));
+            backgroundColors.Add(randomColor);
+        }
+
+        var dataset = new PieDataset<int>(data)
+        {
+            BackgroundColor = backgroundColors.ToArray()
+        };
+
+        return dataset;
+    }
+}
