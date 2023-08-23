@@ -6,12 +6,20 @@
 @if (AccountService.Accounts != null)
 {
     <div>
+        <GridRow Justify="center" Align="middle">
+            <GridCol>
+                <DatePicker TValue="DateTime?" @bind-Value="Month" Picker="@DatePickerType.Month"/>
+            </GridCol>
+            <GridCol>
+                <DatePicker TValue="DateTime?" @bind-Value="Year" Picker="@DatePickerType.Year"/>
+            </GridCol>
+        </GridRow>
         <GridRow Style="font-family: EightBitsFont;" Justify="space-around" Align="middle">
             @foreach (var account in AccountService.Accounts)
             {
                 <GridCol Class="gutter-row" Span="11" Style="height: 800px;">
                     <Divider>@account.Name</Divider>
-                    <AccountPieChart Account="@account"/>
+                    <AccountPieChart Account="@account" Date="@Month" @key="@account.FinancialAccountId"/>
                     <AccountBarChart Account="@account"/>
                 </GridCol>
             }
@@ -21,6 +29,9 @@
 
 @code
 {
+    public DateTime? Year { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    public DateTime? Month { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    
     protected override async Task OnInitializedAsync()
     {
         await AccountService.GetAccounts();

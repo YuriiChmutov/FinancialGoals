@@ -10,5 +10,4 @@ public class AccountToReturn
     public double Balance { get; set; }
     public CurrencyInfo CurrencyInfo { get; set; }
     public List<CategoryToReturn> Categories { get; set; }
-    public string Test { get; set; }
 }

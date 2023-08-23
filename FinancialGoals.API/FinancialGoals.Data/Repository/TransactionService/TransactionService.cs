@@ -110,14 +110,34 @@ public class TransactionService : ITransactionService
         return result;
     }
 
-    public decimal GetSpendAmountByCategory(int categoryId)
+    public decimal GetSpendAmountByCategory(int categoryId, DateTime? date = null)
     {
+        if (!date.HasValue)
+        {
+            date = DateTime.Now;
+        }
         var amount = _context.Transactions
-            .Where(t => t.CategoryId == categoryId)
+            .Where(t => t.CategoryId == categoryId && t.Date.Month == date.Value.Month)
             .Select(t => t.Amount)
             .Sum();
     
         return (decimal)amount;
+    }
+
+    public async Task<List<ExpensesPerMonthByCategoryDTO>> GetExpensesAmountByCategoryPerMonth(int accountId, int month, int year)
+    {
+        var data = await _context.Transactions
+            .Where(x => x.Date.Month == month && x.Date.Year == year && x.FinancialAccountId == accountId)
+            .GroupBy(x => x.CategoryId)
+            .Select(group => new ExpensesPerMonthByCategoryDTO
+            {
+                CategoryId = group.Key,
+                CategoryName = group.FirstOrDefault()!.Category.Name,
+                Amount = (decimal)group.Sum(x => x.Amount)
+            })
+            .ToListAsync();
+    
+        return data;
     }
 
     public async Task<bool> TransactionExistsAsync(int id)

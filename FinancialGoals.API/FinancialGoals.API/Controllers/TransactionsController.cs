@@ -52,6 +52,14 @@ namespace FinancialGoals.API.Controllers
             return Ok(data);
         }
 
+        [HttpGet("account-transactions-per-month/{accountId}/{year}/{month}")]
+        public async Task<ActionResult<List<ExpensesPerMonthByCategoryDTO>>> GetExpensesAmountByCategoryPerMonth(
+            int accountId, int year, int month)
+        {
+            var data = await _transactionService.GetExpensesAmountByCategoryPerMonth(accountId, month, year);
+            return Ok(data);
+        }
+
         // GET: api/Transactions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionToReturn>> GetTransaction(int id)

@@ -39,7 +39,7 @@ public class TransactionService : ITransactionService
     
     public async Task GetTransactionsForAccount(int accountId, int page)
     {
-        if (_accountService.Accounts == null)
+        if (_accountService.Accounts.Count < 1)
         {
             await _accountService.GetAccounts();
         }
@@ -52,6 +52,12 @@ public class TransactionService : ITransactionService
             CurrentPage = result.CurrentPage;
             PageCount = result.Pages;
         }
+    }
+
+    public async Task<List<ExpensesPerMonthByCategoryDTO>> GetExpensesAmountByCategoryPerMonth(int accountId, int year, int month)
+    {
+        var result = await _http.GetFromJsonAsync<List<ExpensesPerMonthByCategoryDTO>>($"https://localhost:7128/api/Transactions/account-transactions-per-month/{accountId}/{year}/{month}");
+        return result!;
     }
 
     public async Task<Dictionary<string, double>> GetAllTransactionsForAccount(int accountId, int year)

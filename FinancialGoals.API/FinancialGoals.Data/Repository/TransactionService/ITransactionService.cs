@@ -15,5 +15,6 @@ public interface ITransactionService
     Task AddTransactionAsync(Transaction transaction);
     Task UpdateTransactionAsync(int id, Transaction transaction);
     Task DeleteTransactionAsync(int id);
-    decimal GetSpendAmountByCategory(int categoryId);
+    decimal GetSpendAmountByCategory(int categoryId, DateTime? date = null);
+    Task<List<ExpensesPerMonthByCategoryDTO>> GetExpensesAmountByCategoryPerMonth(int accountId, int month, int year);
 }
