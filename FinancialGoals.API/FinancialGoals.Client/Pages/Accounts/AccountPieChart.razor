@@ -1,45 +1,65 @@
 ﻿@using ChartJs.Blazor.PieChart
 @using FinancialGoals.Core.DTOs.Account
 
+@inject ITransactionService TransactionService
 
-<div style="font-family: EightBitsFont;">
-    <Chart Config="_config"></Chart>
-</div>
+@if (Account != null)
+{
+    <div style="font-family: EightBitsFont;">
+        <Chart Config="_config"></Chart>
+    </div>
+}
+
 
 @code {
-
     [Parameter]
     public AccountToReturn Account { get; set; }
+    [Parameter]
+    public DateTime? Date { get; set; }
 
     private PieConfig _config = new PieConfig();
 
-    protected override void OnInitialized()
+    protected override async Task OnParametersSetAsync()
     {
+        await UpdateConfigAsync();
+    }
+
+    private async Task UpdateConfigAsync()
+    {
+        Date ??= DateTime.Today;
+        
         _config.Options = new PieOptions
+        {
+            Responsive = true,
+            Legend = new Legend
             {
-                Responsive = true,
-                Legend = new Legend
-                {
-                    Position = Position.Right
-                },
-                Title = new OptionsTitle
-                {
-                    Display = true,
-                    Text = "todo: per month should be"
-                }
-            };
+                Position = Position.Right
+            },
+            Title = new OptionsTitle
+            {
+                Display = true,
+                Text = $"Expenses by categories in year: {Date.Value.Year}, month: {Date.Value:MMMM}"
+            }
+        };
 
-        var dataset = CreateRandomColoredPieDataset(Account.Categories.Select(c => (int)c.Amount).ToList());
+        var data = await TransactionService.GetExpensesAmountByCategoryPerMonth(Account.FinancialAccountId, Date.Value.Year, Date.Value.Month);
 
-        foreach (var categoryName in Account.Categories.Where(c => c.Amount > 0).Select(c => c.Name))
+        var dataset = CreateRandomColoredPieDataset(data.Select(x => x.Amount).ToList());
+
+        _config.Data.Labels.Clear();
+        
+        foreach (var categoryName in data.Select(x => x.CategoryName))
         {
             _config.Data.Labels.Add(categoryName);
         }
 
+        _config.Data.Datasets.Clear();
         _config.Data.Datasets.Add(dataset);
+
+        StateHasChanged();
     }
 
-    private PieDataset<int> CreateRandomColoredPieDataset(List<int> data)
+    private PieDataset<decimal> CreateRandomColoredPieDataset(List<decimal> data)
     {
         var random = new Random();
         var backgroundColors = new List<string>();
@@ -50,7 +70,7 @@
             backgroundColors.Add(randomColor);
         }
 
-        var dataset = new PieDataset<int>(data)
+        var dataset = new PieDataset<decimal>(data)
         {
             BackgroundColor = backgroundColors.ToArray()
         };

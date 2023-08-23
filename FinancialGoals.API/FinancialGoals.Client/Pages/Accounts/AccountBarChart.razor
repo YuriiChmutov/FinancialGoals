@@ -5,10 +5,12 @@
 
 @inject ITransactionService TransactionService
 
-<div style="font-family: EightBitsFont;">
-
-    <Chart Config="_config"></Chart>
-</div>
+@if (Account != null)
+{
+    <div style="font-family: EightBitsFont;">
+        <Chart Config="_config"></Chart>
+    </div>
+}
 
 @code {
     [Parameter]
