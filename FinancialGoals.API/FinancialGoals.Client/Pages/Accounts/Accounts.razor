@@ -1,5 +1,6 @@
 ﻿@page "/Accounts"
 @using FinancialGoals.Client.Services.AccountService
+@using System.Globalization
 
 @inject IAccountService AccountService
 
@@ -8,29 +9,42 @@
     <div>
         <GridRow Justify="center" Align="middle">
             <GridCol>
-                <DatePicker TValue="DateTime?" @bind-Value="Month" Picker="@DatePickerType.Month"/>
-            </GridCol>
-            <GridCol>
-                <DatePicker TValue="DateTime?" @bind-Value="Year" Picker="@DatePickerType.Year"/>
+                <DatePicker
+                    Size="large"
+                    Style="width: 300px; border-radius: 5px; border-color: gold; font-family: EightBitsFont;"
+                    TValue="DateTime?"
+                    @bind-Value="Date"
+                    Picker="@DatePickerType.Month"/>
             </GridCol>
         </GridRow>
         <GridRow Style="font-family: EightBitsFont;" Justify="space-around" Align="middle">
             @foreach (var account in AccountService.Accounts)
             {
-                <GridCol Class="gutter-row" Span="11" Style="height: 800px;">
+                <GridCol Class="gutter-row" Span="11" Style="height: 400px;">
                     <Divider>@account.Name</Divider>
-                    <AccountPieChart Account="@account" Date="@Month" @key="@account.FinancialAccountId"/>
-                    <AccountBarChart Account="@account"/>
+                    <AccountPieChart Account="@account" Date="@Date" @key="@account.FinancialAccountId"/>
+                </GridCol>
+            }
+            
+            @foreach (var account in AccountService.Accounts)
+            {
+                <GridCol Class="gutter-row" Span="11" Style="height: 400px;">
+                    <AccountBarChart Account="@account" Date="@Date" @key="@account.FinancialAccountId"/>
                 </GridCol>
             }
         </GridRow>
     </div>
 }
 
+<style>
+    .test-class {
+        color: #0f5132;
+    }
+</style>
+
 @code
 {
-    public DateTime? Year { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-    public DateTime? Month { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    public DateTime? Date { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
     
     protected override async Task OnInitializedAsync()
     {

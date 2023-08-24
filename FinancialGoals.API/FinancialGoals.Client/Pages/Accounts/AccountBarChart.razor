@@ -15,10 +15,20 @@
 @code {
     [Parameter]
     public AccountToReturn Account { get; set; }
+    [Parameter]
+    public DateTime? Date { get; set; }
+    
     private BarConfig _config = new BarConfig();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        await UpdateConfigAsync();
+    }
+
+    private async Task UpdateConfigAsync()
+    {
+        Date ??= DateTime.Today;
+        
         _config.Options = new BarOptions
         {
             Responsive = true,
@@ -30,22 +40,27 @@
             Title = new OptionsTitle
             {
                 Display = true,
-                Text = "Expenses in 2023"
+                Text = $"Expenses in {Date.Value.Year}"
             }
         };
 
-        var monthlyExpenses = await TransactionService.GetAllTransactionsForAccount(Account.FinancialAccountId, 2023);
+        var monthlyExpenses = await TransactionService.GetAllTransactionsForAccount(Account.FinancialAccountId, Date.Value.Year);
         var expenses = new List<double>();
-
 
         monthlyExpenses.ForEach(x =>
         {
             expenses.Add(x.Value);
+        });
+        
+        var dataset = CreateRandomColoredBarDataset(expenses);
+        _config.Data.Labels.Clear();
+        
+        monthlyExpenses.ForEach(x =>
+        {
             _config.Data.Labels.Add(x.Key);
         });
-
-        var dataset = CreateRandomColoredBarDataset(expenses);
-
+        
+        _config.Data.Datasets.Clear();
         _config.Data.Datasets.Add(dataset);
     }
 
