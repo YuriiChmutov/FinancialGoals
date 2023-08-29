@@ -133,7 +133,8 @@ public class TransactionService : ITransactionService
             {
                 CategoryId = group.Key,
                 CategoryName = group.FirstOrDefault()!.Category.Name,
-                Amount = (decimal)group.Sum(x => x.Amount)
+                Amount = (decimal)group.Sum(x => x.Amount),
+                Color = group.FirstOrDefault()!.Category.Color
             })
             .ToListAsync();
     

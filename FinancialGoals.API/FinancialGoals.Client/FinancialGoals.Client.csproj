@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <RunAOTComplilation>true</RunAOTComplilation>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +14,7 @@
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
         <PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />
         <PackageReference Include="Blazor.Bootstrap" Version="1.10.0" />
+        <PackageReference Include="BlazorColorPicker" Version="2.3.0" />
         <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
         <PackageReference Include="Blazored.Modal" Version="7.1.0" />
         <PackageReference Include="Blazorise.Charts" Version="1.3.1" />
@@ -23,6 +25,8 @@
         <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="Syncfusion.Blazor.Inputs" Version="22.2.11" />
+        <PackageReference Include="Syncfusion.Blazor.Themes" Version="22.2.11" />
 <!--        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />-->
     </ItemGroup>
 

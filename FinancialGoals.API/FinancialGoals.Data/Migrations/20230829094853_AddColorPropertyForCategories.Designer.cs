@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinancialGoals.Data.Migrations
 {
     [DbContext(typeof(FinancialDbContext))]
-    [Migration("20230807085321_NewDB")]
-    partial class NewDB
+    [Migration("20230829094853_AddColorPropertyForCategories")]
+    partial class AddColorPropertyForCategories
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,6 +47,10 @@ namespace FinancialGoals.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"), 1L, 1);
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("Default")
                         .HasColumnType("bit");
 
@@ -62,6 +66,9 @@ namespace FinancialGoals.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
 
                     b.HasKey("CategoryId");
 

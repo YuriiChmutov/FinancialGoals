@@ -12,4 +12,5 @@ public class CategoryToReturn
     public int FinancialAccountId { get; set; }
     public TransactionType TransactionType { get; set; }
     public bool Default { get; set; }
+    public string Color { get; set; } = String.Empty;
 }

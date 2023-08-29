@@ -20,18 +20,30 @@ else
             <div class="row">
                 <div class="col-md-6 mb-4">
                     <div class="form-outline">
-                        <label for="name">Category name</label>
+                        <label style="margin-left: 1%" for="name">Category name</label>
                         <Input id="name" @bind-Value="@context.Name" class="form-control" style="border-radius: 5px"/>
                         <ValidationMessage For="@(() => context.Name)"/>
                     </div>
                     
                     <div class="form-outline">
-                        <label for="limit">Limit</label>
-                        <AntDesign.InputNumber @bind-Value="@context.Limit"
-                                               Style="font-family: EightBitsFont; 
-                                                            border-radius: 5px;
-                                                             width: auto";/>
-                        <ValidationMessage For="@(() => context.Limit)"/>
+                        <div>
+                            <label style="margin-left: 1%" for="limit">Limit</label>
+                        </div>
+                        <GridRow Justify="space-between">
+                            <GridCol Span="16">
+                                <AntDesign.InputNumber @bind-Value="@context.Limit"
+                                                       Style="font-family: EightBitsFont; 
+                                                                    border-radius: 5px;
+                                                                     width: auto"/>
+                                <ValidationMessage For="@(() => context.Limit)"/>
+                            </GridCol>
+                            <GridCol Span="8" Style="flex: initial">
+                                <SfColorPicker  TValue="string" @bind-Value="@context.Color"/>
+                            </GridCol>
+                        </GridRow>
+                    </div>
+                    <div>
+                        
                     </div>
                 </div>
             

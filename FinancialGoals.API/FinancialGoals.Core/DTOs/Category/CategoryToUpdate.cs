@@ -12,4 +12,5 @@ public class CategoryToUpdate
     public UploadedFileModel File { get; set; }
     public CategoryWhatWasChanged Changed { get; set; }
     public string FilePath { get; set; } = string.Empty;
+    public string Color { get; set; } = String.Empty;
 }

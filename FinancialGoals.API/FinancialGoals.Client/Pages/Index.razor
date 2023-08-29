@@ -4,9 +4,19 @@
 
 <h3>Home page</h3>
 
+<SfColorPicker TValue="string" @bind-Value="@SelectedColor"/>
 
-@code
-{
+<div style="margin-top: 20px;">
+    Selected Color: <span style="background-color: @SelectedColor; color: white; padding: 4px;">@SelectedColor</span>
+</div>
 
+@code {
+    private string SelectedColor { get; set; } = "#ff0000";
+
+    public void OnChange(ColorPickerEventArgs args)
+    {
+        var colorValue = (ColorPickerValue) args.CurrentValue;
+        this.SelectedColor = colorValue.Hex;
+    }
 }
 

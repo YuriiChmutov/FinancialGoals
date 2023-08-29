@@ -13,5 +13,6 @@ namespace FinancialGoals.Core.Models
         public int FinancialAccountId { get; set; }
         public bool Default { get; set; } = false;
         public TransactionType TransactionType { get; set; } = TransactionType.Expense;
+        public string Color { get; set; } = String.Empty;
     }
 }

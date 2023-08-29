@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinancialGoals.Data.Migrations
 {
     [DbContext(typeof(FinancialDbContext))]
-    [Migration("20230807145221_AddTransactionTypeForCategory")]
-    partial class AddTransactionTypeForCategory
+    [Migration("20230828103419_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -1,5 +1,6 @@
 ﻿@using ChartJs.Blazor.PieChart
 @using FinancialGoals.Core.DTOs.Account
+@using System.Drawing
 
 @inject ITransactionService TransactionService
 
@@ -44,7 +45,7 @@
 
         var data = await TransactionService.GetExpensesAmountByCategoryPerMonth(Account.FinancialAccountId, Date.Value.Year, Date.Value.Month);
 
-        var dataset = CreateRandomColoredPieDataset(data.Select(x => x.Amount).ToList());
+        var dataset = CreateRandomColoredPieDataset(data.Select(x => (x.Amount, x.Color)).ToList());
 
         _config.Data.Labels.Clear();
         
@@ -59,18 +60,16 @@
         StateHasChanged();
     }
 
-    private PieDataset<decimal> CreateRandomColoredPieDataset(List<decimal> data)
+    private PieDataset<decimal> CreateRandomColoredPieDataset(List<(decimal Amount, string Color)> data)
     {
-        var random = new Random();
         var backgroundColors = new List<string>();
 
         for (int i = 0; i < data.Count; i++)
         {
-            var randomColor = ColorUtil.ColorHexString((byte)random.Next(0, 256), (byte)random.Next(0, 256), (byte)random.Next(0, 256));
-            backgroundColors.Add(randomColor);
+            backgroundColors.Add(data[i].Color);
         }
 
-        var dataset = new PieDataset<decimal>(data)
+        var dataset = new PieDataset<decimal>(data.Select(x => x.Amount))
         {
             BackgroundColor = backgroundColors.ToArray()
         };

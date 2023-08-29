@@ -23,6 +23,7 @@ namespace FinancialGoals.Data.Data
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = FinancialGoals");
+                // optionsBuilder.UseSqlServer("Data Source = DESKTOP-9N3RA63\\SQLEXPRESS; Initial Catalog = FinancialGoalsDB; User Id = Test; Password=1234");
             }
         }
     }

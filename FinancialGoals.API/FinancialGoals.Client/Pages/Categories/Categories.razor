@@ -1,13 +1,16 @@
 ﻿@page "/categories"
 
-@inject IModalService modal
-@inject ICategoryService CategoryService
-@inject ImageService ImageService
-@inject IAccountService AccountService
 @using FinancialGoals.Client.Services.AccountService
 @using FinancialGoals.Services
 @using ImageService = FinancialGoals.Client.Services.ImageService
 @using ModalOptions = Blazored.Modal.ModalOptions
+@using BlazorColorPicker
+
+@inject IModalService modal
+@inject ICategoryService CategoryService
+@inject ImageService ImageService
+@inject IAccountService AccountService
+
 @implements IDisposable
 
 <PageTitle>Categories</PageTitle>
@@ -56,7 +59,7 @@ else
                                                actionDelete(!category.Default ? () => OpenDeleteForm(category.CategoryId, category.Name) : () => ShowAlertWindow("delete"))
                                            })">
                                 <Extra>
-                                    @cardTitleArrow(category.TransactionType)
+                                    @cardTitleArrow(category.TransactionType, category.Color)
                                 </Extra>
                                 <Body>
                                 <Divider Orientation="center">
@@ -148,9 +151,9 @@ else
     RenderFragment actionEdit(Action clickAction) => @<Icon Type="edit" OnClick="@clickAction"/>;
     RenderFragment actionDelete(Action clickAction) =>@<Icon Type="delete" OnClick="@clickAction"/>;
 
-    RenderFragment cardTitleArrow(TransactionType type) => type == TransactionType.Expense ? 
-        @<i class="oi oi-arrow-thick-top" style="color: #FA8072"></i> : 
-        @<i class="oi oi-arrow-thick-bottom" style="color: #BDB76B"></i>;
+    RenderFragment cardTitleArrow(TransactionType type, string arrowColor) => type == TransactionType.Expense ? 
+        @<i class="oi oi-arrow-thick-top" style="color: @arrowColor"></i> : 
+        @<i class="oi oi-arrow-thick-bottom" style="color: @arrowColor"></i>;
     
     private async Task OpenCreateForm(int accountId)
     {

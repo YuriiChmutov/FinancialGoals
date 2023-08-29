@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FinancialGoals.Data.Migrations
 {
-    public partial class NewDB : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -81,7 +81,8 @@ namespace FinancialGoals.Data.Migrations
                     Limit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ImageName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FinancialAccountId = table.Column<int>(type: "int", nullable: false),
-                    Default = table.Column<bool>(type: "bit", nullable: false)
+                    Default = table.Column<bool>(type: "bit", nullable: false),
+                    TransactionType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -66,14 +66,20 @@
 
     private BarDataset<double> CreateRandomColoredBarDataset(List<double> data)
     {
-        var random = new Random();
         var backgroundColors = new List<string>();
-
-        for (int i = 0; i < data.Count; i++)
-        {
-            var randomColor = ColorUtil.ColorHexString((byte)random.Next(0, 256), (byte)random.Next(0, 256), (byte)random.Next(0, 256));
-            backgroundColors.Add(randomColor);
-        }
+        
+        backgroundColors.Add("#FFFFFF"); // Jan
+        backgroundColors.Add("#C0C0C0"); // Feb
+        backgroundColors.Add("#90EE90"); // Mar
+        backgroundColors.Add("#FF69B4"); // Apr
+        backgroundColors.Add("#00FF00"); // May
+        backgroundColors.Add("#FFFF00"); // Jun
+        backgroundColors.Add("#FFA500"); // Jul
+        backgroundColors.Add("#FF8C00"); // Aug
+        backgroundColors.Add("#FF4500"); // Sep
+        backgroundColors.Add("#FF7518"); // Oct
+        backgroundColors.Add("#A52A2A"); // Nov
+        backgroundColors.Add("#00008B"); // Dec
 
         var dataset = new BarDataset<double>(data)
         {

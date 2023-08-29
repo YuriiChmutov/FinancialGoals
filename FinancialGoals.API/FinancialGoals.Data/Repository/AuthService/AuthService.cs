@@ -61,7 +61,8 @@ public class AuthService : IAuthService
                 Default = true,
                 ImageName = "income.png",
                 Limit = 0,
-                TransactionType = TransactionType.Income
+                TransactionType = TransactionType.Income,
+                Color = "#2E8B57"
             },
             new Category
             {
@@ -69,7 +70,8 @@ public class AuthService : IAuthService
                 Default = true,
                 ImageName = "shopping-basket.png",
                 Limit = 0,
-                TransactionType = TransactionType.Expense
+                TransactionType = TransactionType.Expense,
+                Color = "#FF8C00"
             }
         };
         

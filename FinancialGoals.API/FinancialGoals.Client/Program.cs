@@ -10,6 +10,7 @@ using FinancialGoals.Client.Services;
 using FinancialGoals.Client.Services.AccountService;
 using FinancialGoals.Client.Services.AuthService;
 using FinancialGoals.Client.Services.TransactionService;
+using Syncfusion.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -31,5 +32,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAntDesign();
 builder.Services.AddBlazoredModal();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddSyncfusionBlazor();
+
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NGaF1cWGhAYVF+WmFZfV1gcV9EYlZTQWYuP1ZhSXxQdk1hUH9bcnZXQGRbVEE=");
 
 await builder.Build().RunAsync();

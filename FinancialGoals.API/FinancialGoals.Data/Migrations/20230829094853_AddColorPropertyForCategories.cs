@@ -4,22 +4,22 @@
 
 namespace FinancialGoals.Data.Migrations
 {
-    public partial class AddTransactionTypeForCategory : Migration
+    public partial class AddColorPropertyForCategories : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "TransactionType",
+            migrationBuilder.AddColumn<string>(
+                name: "Color",
                 table: "Categories",
-                type: "int",
+                type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: "");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "TransactionType",
+                name: "Color",
                 table: "Categories");
         }
     }
