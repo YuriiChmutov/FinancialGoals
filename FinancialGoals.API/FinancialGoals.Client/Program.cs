@@ -34,6 +34,6 @@ builder.Services.AddBlazoredModal();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSyncfusionBlazor();
 
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NGaF1cWGhAYVF+WmFZfV1gcV9EYlZTQWYuP1ZhSXxQdk1hUH9bcnZXQGRbVEE=");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NHaF5cXmVCf1JpRGFGfV5yd0VOal9XTnNcUiweQnxTdEZiWX5dcXVQQ2NdVUN/Vw==");
 
 await builder.Build().RunAsync();

@@ -36,7 +36,7 @@
                         ListType="picture-card"
                         ShowUploadList="false"
                         BeforeUpload="BeforeUpload"
-                        OnChange="HandleChange">
+                        OnChange=@HandleChange>
                     @if (!string.IsNullOrWhiteSpace(imageUrl))
                     {
                         <img src="@imageUrl" alt="avatar" style="width: 100%"/>
@@ -98,7 +98,7 @@
         return isJpgOrPng && isLt2M;
     }
     
-    async void HandleChange(UploadInfo fileinfo) // todo change to Task
+    private void HandleChange(UploadInfo fileinfo)
     {
         if (fileinfo.File.State == UploadState.Success)
         {
@@ -109,7 +109,7 @@
                 Name = fileinfo.File.FileName,
                 Type = fileinfo.File.Type,
                 Size = fileinfo.File.Size,
-                Data = await GetFileData(fileinfo.File.ObjectURL)
+                Data = GetFileData(fileinfo.File.ObjectURL).Result
             };
     
             categoryToCreate.File = uploadedFile;

@@ -22,6 +22,24 @@ public class AuthController : ControllerBase
         _context = context;
     }
     
+    /// <summary>
+    /// Registers (creates) new user.
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST api/auth/register
+    ///     {
+    ///         "email": "yurii@example.com",
+    ///         "firstName": "Yurii",
+    ///         "secondName": "Chmutov",
+    ///         "password": "1111",
+    ///         "confirmPassword": "1111"
+    ///     }
+    /// 
+    /// </remarks>
+    /// <param name="request">User register data</param>
+    /// <returns></returns>
     [HttpPost("register")]
     public async Task<ActionResult<ServiceResponse<string>>> PostUser(UserRegister request)
     {
@@ -42,6 +60,21 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
     
+    /// <summary>
+    /// Logins existed user.
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST api/auth/login
+    ///     {
+    ///         "email": "yurii@example.com",
+    ///         "password": "1111"
+    ///     }
+    /// 
+    /// </remarks>
+    /// <param name="request">Email and password.</param>
+    /// <returns></returns>
     [HttpPost("login")]
     public async Task<ActionResult<ServiceResponse<string>>> Login(UserLogin request)
     {
@@ -52,6 +85,20 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Updates password for registered user.
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST api/auth/change-password
+    ///     {
+    ///         "new_password"
+    ///     }
+    /// 
+    /// </remarks>
+    /// <param name="newPassword">A string with a new password</param>
+    /// <returns></returns>
     [HttpPost("change-password"), Authorize]
     public async Task<ActionResult<ServiceResponse<bool>>> ChangePassword([FromBody] string newPassword)
     {

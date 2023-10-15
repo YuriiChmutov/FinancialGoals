@@ -1,3 +1,4 @@
+using System.Reflection;
 using FinancialGoals.API;
 using FinancialGoals.API.Middlewares;
 using FinancialGoals.Data.Data;
@@ -15,6 +16,7 @@ using FinancialGoals.Data.Repository.TransactionService;
 using FinancialGoals.Data.Resolvers;
 using FinancialGoals.Services;
 using Microsoft.Azure.Cosmos;
+using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,7 +37,26 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 //builder.Services.AddSwaggerGen(c => c.AddSwaggerApiKeySecurity());
 
-builder.Services.AddSwaggerGen(c => c.AddSwaggerJWTSecurity());
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSwaggerJWTSecurity();
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FinancialGoals API",
+        Version = "v1",
+        Description = "An API to manage operations with finance",
+        Contact = new OpenApiContact
+        {
+            Name = "Yuri Chmutov",
+            Email = "yurii.chmutov@gmail.com",
+            Url = new Uri("https://github.com/YuriiChmutov")
+        }
+    });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 
 //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 //    .AddCookie(o =>
@@ -115,6 +136,8 @@ builder.Services.AddDbContext<CosmosDbContext>(options =>
 //});
 
 var app = builder.Build();
+
+app.UseStaticFiles();
 
 app.UseCors(builder =>
 {

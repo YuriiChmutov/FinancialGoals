@@ -24,6 +24,13 @@ namespace FinancialGoals.API.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Gets all user's transactions. Without connection with accounts.
+        /// Returns specific page - skips some amount of transactions.
+        /// Page has data about 4 transactions.
+        /// </summary>
+        /// <param name="page">Page number</param>
+        /// <returns></returns>
         // GET: api/Transactions/user-transactions/1
         [HttpGet("user-transactions/{page}")]
         public async Task<ActionResult<TransactionsDataDTO>> GetTransactions(int page)
@@ -34,6 +41,14 @@ namespace FinancialGoals.API.Controllers
             return Ok(transactionsFromRepo);
         }
 
+        /// <summary>
+        /// Gets all user's transactions for specific account.
+        /// Returns specific page - skips some amount of transactions.
+        /// Page has data about 4 transactions.
+        /// </summary>
+        /// <param name="accountId">User account id</param>
+        /// <param name="page">Page number</param>
+        /// <returns></returns>
         // GET: api/Transactions/user-transactions/1/1
         [HttpGet("user-transactions/{accountId}/{page}")]
         public async Task<ActionResult<TransactionsDataDTO>> GetTransactions(int accountId, int page)
@@ -44,6 +59,14 @@ namespace FinancialGoals.API.Controllers
             return Ok(transactionsFromRepo);
         }
 
+        /// <summary>
+        /// Gets all user's transactions for specific account in specific year.
+        /// Returns specific page - skips some amount of transactions.
+        /// Page has data about 4 transactions.
+        /// </summary>
+        /// <param name="accountId">User account id</param>
+        /// <param name="year">Specific year</param>
+        /// <returns></returns>
         [HttpGet("account-transactions/{accountId}/{year}")]
         public async Task<ActionResult<Dictionary<string, double>>> GetTransactionsSpendsForEachMonthPerYear(int accountId, int year)
         {
@@ -52,6 +75,15 @@ namespace FinancialGoals.API.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Gets all user's transactions for specific account in specific year and month.
+        /// Returns specific page - skips some amount of transactions.
+        /// Page has data about 4 transactions.
+        /// </summary>
+        /// <param name="accountId">User account id</param>
+        /// <param name="year">Specific year</param>
+        /// <param name="month">Specific month</param>
+        /// <returns></returns>
         [HttpGet("account-transactions-per-month/{accountId}/{year}/{month}")]
         public async Task<ActionResult<List<ExpensesPerMonthByCategoryDTO>>> GetExpensesAmountByCategoryPerMonth(
             int accountId, int year, int month)
@@ -60,6 +92,11 @@ namespace FinancialGoals.API.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Gets data about specific transaction.
+        /// </summary>
+        /// <param name="id">Transaction id</param>
+        /// <returns></returns>
         // GET: api/Transactions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionToReturn>> GetTransaction(int id)
@@ -72,6 +109,25 @@ namespace FinancialGoals.API.Controllers
             return transactionToReturn;
         }
         
+        /// <summary>
+        /// Creates new transaction
+        /// </summary>
+        /// <remarks>
+        /// Simple request:
+        ///
+        ///     POST api/Transactions
+        ///     {
+        ///         "amount": 499,
+        ///         "type": 0,
+        ///         "date": "2023-10-10T18:18:46.989Z",
+        ///         "description": "I bought food",
+        ///         "financialAccountId": 1,
+        ///         "categoryId": 4
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="request">Transaction data</param>
+        /// <returns></returns>
         // POST: api/Transactions
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(TransactionToCreate request)
@@ -83,6 +139,13 @@ namespace FinancialGoals.API.Controllers
             return Ok(transactionToReturn);
         }
 
+        /// <summary>
+        /// Updates transaction
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPut("{accountId}/{id}")]
         public async Task<ActionResult> PutTransaction(int accountId, int id, TransactionToUpdate request)
         {
@@ -93,6 +156,11 @@ namespace FinancialGoals.API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Removes transaction. No soft delete.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // DELETE: api/Transactions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransaction(int id)
